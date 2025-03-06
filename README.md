@@ -1,1 +1,1 @@
-# Appointment_System
+# AppointmentSystem
