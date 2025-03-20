@@ -5,123 +5,177 @@ namespace AppointmentSystem
 {
     internal class Program
     {
+        static List<string> appointments = new List<string>();
+        static List<int> availableAppointments = new List<int>();
+
         static void Main(string[] args)
         {
-            List<string> appointments = new List<string>();
-            List<int> cancelledAppointment = new List<int>();
 
-            Console.WriteLine("Welcome to Aesthetic Clinic!\n");
+            Console.WriteLine("=== Welcome to Aesthetic Clinic! ===\n");
+            DisplayServices();
 
+            DisplayActions();
+            int action = GetUserInput();
+
+
+            while (action != 4)
+            {
+
+                switch (action)
+                {
+                    case 1:
+                        BookAppointment();
+                        break;
+
+                    case 2:
+                        ViewAppointments();
+                        break;
+
+                    case 3:
+                        CancelAppointment();
+                        break;
+
+                    case 4:
+                        Console.WriteLine("EXIT");
+                        break;
+                    default:
+                        Console.WriteLine("INVALID. Please enter between 1-4 only.");
+                        break;
+                }
+                DisplayActions();
+                action = GetUserInput();
+            }
+
+
+        }
+        static void DisplayServices()
+        {
             string[] services = new string[]
             {
                 "* Whitening Peel",
                 "* Facial Treatment",
                 "* Chemical Peeling",
                 "* Facial Focusing Acne",
-                "* Laser Treatment\n"
-            };
+                "* Laser Treatment\n"};
 
-            Console.WriteLine("Available Services");
+            Console.WriteLine("=== Available Services ====");
 
             foreach (var service in services)
             {
                 Console.WriteLine(service);
             }
+        }
 
-            Boolean bl = true;
-
-            while (bl)
-            {
-                string[] actions = new string[]
+        static void DisplayActions()
+        {
+            string[] actions = new string[]
                 {
                     "[1] Book Appointment",
                     "[2] View Appointments",
                     "[3] Cancel Appointment",
-                    "[4] Exit\n"
+                    "[4] Exit"
                 };
 
-                foreach (var action in actions)
-                {
-                    Console.WriteLine(action);
-                }
-                Console.Write("Enter Action: ");
-                int userAction = Convert.ToInt16(Console.ReadLine());
+            Console.WriteLine("---------------------------");
 
-                switch (userAction)
-                {
-                    case 1:
-                        Console.Write("Enter Name: ");
-                        string name = Console.ReadLine();
+            foreach (var action in actions)
+            {
+                Console.WriteLine(action);
+            }
 
-                        Console.Write("Enter Appointment Date (YYYY-MM-DD): ");
-                        string date = Console.ReadLine();
+            Console.WriteLine("---------------------------");
+        }
 
-                        Console.Write("Enter Appointment Time (HH:MM AM/PM): ");
-                        string time = Console.ReadLine();
+        static int GetUserInput()
+        {
+            Console.Write("\nEnter Action: ");
+            int action = Convert.ToInt16(Console.ReadLine());
 
-                        Console.Write("Enter Service: ");
-                        string service = Console.ReadLine();
+            return action;
+        }
 
-                        appointments.Add(name + " - " + date + " - " + time + " - " + service);
-                        Console.WriteLine("Appointment Booked Successfully!\n");
-                        break;
+        static void BookAppointment()
+        {
+            Console.WriteLine("---------------------------");
 
-                    case 2:
-                        if (appointments.Count == 0)
-                        {
-                            Console.WriteLine("No scheduled appointments.\n");
-                            break;
-                        }
+            Console.Write("Enter Name: ");
+            string name = Console.ReadLine();
 
-                        Console.WriteLine("Scheduled Appointments: ");
-                        for (int a = 0; a < appointments.Count; a++)
-                        {
-                            Console.WriteLine(a + 1 + ". " + appointments[a]);
-                        }
-                        Console.WriteLine("\n");
-                        break;
+            Console.Write("Enter Appointment Date (YYYY-MM-DD): ");
+            string date = Console.ReadLine();
 
-                    case 3:
-                        if (appointments.Count == 0)
-                        {
-                            Console.WriteLine("There are no appointments to cancel\n");
-                            break;
-                        }
+            Console.Write("Enter Appointment Time (HH:MM AM/PM): ");
+            string time = Console.ReadLine();
 
-                        Console.WriteLine("Scheduled Appointments: ");
-                        cancelledAppointment.Clear();
+            Console.Write("Enter Service: ");
+            string service = Console.ReadLine();
 
-                        int indexNum = 1;
-                        for (int a = 0; a < appointments.Count; a++)
-                        {
-                            if (!appointments[a].Contains("[CANCELLED]"))
-                            {
-                                cancelledAppointment.Add(a);
-                                Console.WriteLine(indexNum + ". " + appointments[a]);
-                                indexNum++;
-                            }
-                        }
-                        Console.WriteLine("");
+            appointments.Add(name + " - " + date + " - " + time + " - " + service);
+            Console.WriteLine("Appointment Booked Successfully!\n");
+        }
 
-                        Console.Write("Enter Appointment number: ");
-                        int appointmentNum = Convert.ToInt16(Console.ReadLine());
+        static void ViewAppointments()
+        {
+            Console.WriteLine("---------------------------");
 
-                        if (appointmentNum >= 1 && appointmentNum <= cancelledAppointment.Count)
-                        {
-                            int index = cancelledAppointment[appointmentNum - 1];
-                            appointments[index] += "[CANCELLED]";
-                            Console.WriteLine("Appointment has been successfully cancelled.\n");
-                        }
-                        break;
+            if (appointments.Count == 0)
+            {
+                Console.WriteLine("No scheduled appointments.\n");
+                return;
+            }
 
-                    case 4:
-                        Console.WriteLine("THANK YOU");
-                        bl = false;
-                        break;
-                }
+            Console.WriteLine("=== Scheduled Appointments: ===");
+            for (int a = 0; a < appointments.Count; a++)
+            {
+                Console.WriteLine(a + 1 + ". " + appointments[a]);
+            }
+            Console.WriteLine("");
+        }
+
+        static void CancelAppointment()
+        {
+            Console.WriteLine("---------------------------");
+
+            availableAppointments.Clear();
+
+            DisplayAvailableAppointments();
+
+            if (availableAppointments.Count == 0)
+            {
+                Console.WriteLine("There are no available appointments to cancel.\n");
+                return;
             }
 
 
+            Console.Write("Enter appointment number to cancel: ");
+            int appointmentNum = Convert.ToInt16(Console.ReadLine());
+
+            if (appointmentNum >= 1 && appointmentNum <= availableAppointments.Count)
+            {
+                int index = availableAppointments[appointmentNum - 1];
+                appointments[index] += " [CANCELLED]";
+                Console.WriteLine("Appointment has been successfully cancelled.\n");
+            }
+            else
+            {
+                Console.WriteLine("INVALID. Please enter a valid appointment number.\n");
+            }
+        }
+
+        static void DisplayAvailableAppointments()
+        {
+
+            int indexNum = 1;
+            for (int a = 0; a < appointments.Count; a++)
+            {
+                if (!appointments[a].Contains("[CANCELLED]"))
+                {
+                    availableAppointments.Add(a);
+                    Console.WriteLine(indexNum + ". " + appointments[a]);
+                    indexNum++;
+                }
+            }
+            Console.WriteLine("");
         }
 
     }
