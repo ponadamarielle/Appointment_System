@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections;
+using AppointmentBusinessDataLogic;
 
 namespace AppointmentSystem
 {
     internal class Program
     {
-        static List<string> appointments = new List<string>();
-        static List<int> availableAppointments = new List<int>();
-
         static void Main(string[] args)
         {
 
@@ -36,7 +34,7 @@ namespace AppointmentSystem
                         break;
 
                     case 4:
-                        Console.WriteLine("EXIT");
+                        Console.WriteLine("EXIT\n");
                         break;
                     default:
                         Console.WriteLine("INVALID. Please enter between 1-4 only.");
@@ -110,7 +108,7 @@ namespace AppointmentSystem
             Console.Write("Enter Service: ");
             string service = Console.ReadLine();
 
-            appointments.Add(name + " - " + date + " - " + time + " - " + service);
+            AppointmentProcess.AddAppointment(name, date, time, service);
             Console.WriteLine("Appointment Booked Successfully!\n");
         }
 
@@ -118,16 +116,16 @@ namespace AppointmentSystem
         {
             Console.WriteLine("---------------------------");
 
-            if (appointments.Count == 0)
+            if (AppointmentProcess.appointments.Count == 0)
             {
                 Console.WriteLine("No scheduled appointments.\n");
                 return;
             }
 
             Console.WriteLine("=== Scheduled Appointments: ===");
-            for (int a = 0; a < appointments.Count; a++)
+            for (int a = 0; a < AppointmentProcess.appointments.Count; a++)
             {
-                Console.WriteLine(a + 1 + ". " + appointments[a]);
+                Console.WriteLine(a + 1 + ". " + AppointmentProcess.appointments[a]);
             }
             Console.WriteLine("");
         }
@@ -136,29 +134,27 @@ namespace AppointmentSystem
         {
             Console.WriteLine("---------------------------");
 
-            availableAppointments.Clear();
+            AppointmentProcess.ClearAvailableAppointments();
 
             DisplayAvailableAppointments();
 
-            if (availableAppointments.Count == 0)
+            if (AppointmentProcess.availableAppointments.Count == 0)
             {
                 Console.WriteLine("There are no available appointments to cancel.\n");
-                return;
-            }
-
-
-            Console.Write("Enter appointment number to cancel: ");
-            int appointmentNum = Convert.ToInt16(Console.ReadLine());
-
-            if (appointmentNum >= 1 && appointmentNum <= availableAppointments.Count)
-            {
-                int index = availableAppointments[appointmentNum - 1];
-                appointments[index] += " [CANCELLED]";
-                Console.WriteLine("Appointment has been successfully cancelled.\n");
             }
             else
             {
-                Console.WriteLine("INVALID. Please enter a valid appointment number.\n");
+                Console.Write("Enter appointment number to cancel: ");
+                int appointmentNum = Convert.ToInt16(Console.ReadLine());
+
+                if (AppointmentProcess.MarkAsCancelled(appointmentNum))
+                {
+                    Console.WriteLine("Appointment has been successfully cancelled.\n");
+                }
+                else
+                {
+                    Console.WriteLine("INVALID. Please enter a valid appointment number.\n");
+                }
             }
         }
 
@@ -166,15 +162,16 @@ namespace AppointmentSystem
         {
 
             int indexNum = 1;
-            for (int a = 0; a < appointments.Count; a++)
+
+            for (int a = 0; a < AppointmentProcess.appointments.Count; a++)
             {
-                if (!appointments[a].Contains("[CANCELLED]"))
+                if (AppointmentProcess.AddAvailableAppointment(a))
                 {
-                    availableAppointments.Add(a);
-                    Console.WriteLine(indexNum + ". " + appointments[a]);
+                    Console.WriteLine(indexNum + ". " + AppointmentProcess.appointments[a]);
                     indexNum++;
                 }
             }
+
             Console.WriteLine("");
         }
 
