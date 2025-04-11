@@ -10,7 +10,19 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="AppointmentBusinessDataLogic\AppointmentBusinessDataLogic.csproj" />
+    <Compile Remove="AppointmentBusinessDataLogic\**" />
+    <Compile Remove="AppointmentCommon\**" />
+    <Compile Remove="AppointmentDataLogic\**" />
+    <EmbeddedResource Remove="AppointmentBusinessDataLogic\**" />
+    <EmbeddedResource Remove="AppointmentCommon\**" />
+    <EmbeddedResource Remove="AppointmentDataLogic\**" />
+    <None Remove="AppointmentBusinessDataLogic\**" />
+    <None Remove="AppointmentCommon\**" />
+    <None Remove="AppointmentDataLogic\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="AppointmentBusinessDataLogic\AppointmentBusinessLogic.csproj" />
   </ItemGroup>
 
 </Project>

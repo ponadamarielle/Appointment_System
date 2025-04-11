@@ -5,49 +5,93 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Xml.Linq;
+using System.Reflection;
+using AppointmentDataLogic;
+using AppointmentCommon;
 
-namespace AppointmentBusinessDataLogic
+namespace AppointmentBusinessLogic
 {
-    class AppointmentProcess
+    public class AppointmentProcess
     {
-        public static List<string> appointments = new List<string>();
-        public static List<int> availableAppointments = new List<int>();
-
-        public static void AddAppointment(string name, string date, string time, string service)
+        public static bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
         {
-            appointments.Add(name + " - " + date + " - " + time + " - " + service);
+            return AppointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
         }
 
-        public static void ClearAvailableAppointments()
-        {
-            availableAppointments.Clear();
-        }
 
-        public static bool MarkAsCancelled(int appointmentNum)
+        public static bool ValidateAppointmentDate(DateOnly date)
         {
-            if (appointmentNum >= 1 && appointmentNum <= availableAppointments.Count)
-            {
-                int index = availableAppointments[appointmentNum - 1];
-                appointments[index] += " [CANCELLED]";
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+            DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
-        public static bool AddAvailableAppointment(int a)
-        {
-            if (!appointments[a].Contains("[CANCELLED]"))
+            if (date >= today)
             {
-                availableAppointments.Add(a);
                 return true;
             }
             return false;
-            
         }
 
+        public static bool ValidateAppointmentId(int appointmentId)
+        {
+            return AppointmentDataProcess.GetAppointmentId(appointmentId) != null;
+        }
+
+        public static bool RequestCancellation(int appointmentId)
+        {
+            var appointment = AppointmentDataProcess.GetAppointmentId(appointmentId);
+
+            if (appointment == null)
+            {
+                return false;
+            }
+
+            if (!ValidateCancellation(appointmentId))
+            {
+                return false;
+            }
+
+            return AppointmentDataProcess.Cancellation(appointmentId);
+        }
+
+        public static bool ValidateCancellation(int appointmentId)
+        {
+            Status status = AppointmentDataProcess.GetAppointmentStatus(appointmentId);
+
+            return status != Status.Cancelled && status != Status.Completed && status != Status.Pending;
+        }
+
+        public static bool RequestReschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        {
+            var appointment = AppointmentDataProcess.GetAppointmentId(appointmentId);
+
+            if (appointment == null)
+            {
+                return false;
+            }
+
+            if (!ValidateReschedule(appointmentId))
+            {
+                return false;
+            }
+
+            return AppointmentDataProcess.Reschedule(appointmentId, newDate, newTime);
+        }
+
+        public static bool ValidateReschedule(int appointmentId)
+        {
+            Status status = AppointmentDataProcess.GetAppointmentStatus(appointmentId);
+
+            return status != Status.Cancelled && status != Status.Completed && status != Status.Rescheduled && status != Status.Pending && status != Status.CancelRequested;
+        }
+
+        public static int GenerateAppointmentId()
+        {
+            return AppointmentDataProcess.GenerateAppointmentId();
+        }
+
+        public static bool ValidateLogin(string username, string password)
+        {
+            return username == "admin" && password == "admin123";
+        }
+        }
 
     }
-}

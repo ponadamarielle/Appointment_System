@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
-using AppointmentBusinessDataLogic;
+using System.Linq;
+using AppointmentBusinessLogic;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace AppointmentSystem
 {
@@ -12,40 +14,41 @@ namespace AppointmentSystem
             Console.WriteLine("=== Welcome to Aesthetic Clinic! ===\n");
             DisplayServices();
 
-            DisplayActions();
-            int action = GetUserInput();
+            int userAction;
 
-
-            while (action != 4)
+            do
             {
+                DisplayActions();
+                userAction = GetUserInput();
 
-                switch (action)
+                switch (userAction)
                 {
                     case 1:
                         BookAppointment();
                         break;
 
                     case 2:
-                        ViewAppointments();
-                        break;
-
-                    case 3:
                         CancelAppointment();
                         break;
 
+                    case 3:
+                        RescheduleAppointment();
+                        break;
+
                     case 4:
+                        LoginAsAdmin();
+                        break;
+                    case 5:
                         Console.WriteLine("EXIT\n");
                         break;
                     default:
-                        Console.WriteLine("INVALID. Please enter between 1-4 only.");
+                        Console.WriteLine("INVALID. Please enter between 1-5 only.");
                         break;
                 }
-                DisplayActions();
-                action = GetUserInput();
             }
-
-
+            while (userAction != 5);
         }
+
         static void DisplayServices()
         {
             string[] services = new string[]
@@ -69,9 +72,10 @@ namespace AppointmentSystem
             string[] actions = new string[]
                 {
                     "[1] Book Appointment",
-                    "[2] View Appointments",
-                    "[3] Cancel Appointment",
-                    "[4] Exit"
+                    "[2] Cancel Appointment",
+                    "[3] Reschedule Appointment",
+                    "[4] Login as Admin",
+                    "[5] Exit"
                 };
 
             Console.WriteLine("---------------------------");
@@ -84,7 +88,7 @@ namespace AppointmentSystem
             Console.WriteLine("---------------------------");
         }
 
-        static int GetUserInput()
+        public static int GetUserInput()
         {
             Console.Write("\nEnter Action: ");
             int action = Convert.ToInt16(Console.ReadLine());
@@ -99,82 +103,122 @@ namespace AppointmentSystem
             Console.Write("Enter Name: ");
             string name = Console.ReadLine();
 
-            Console.Write("Enter Appointment Date (YYYY-MM-DD): ");
-            string date = Console.ReadLine();
+            Console.Write("Enter Mobile Number: ");
+            string mobileNum = Console.ReadLine();
+
+            DateOnly date;
+
+            while (true)
+            {
+                Console.Write("Enter Appointment Date (MM-DD-YYYY): ");
+                date = DateOnly.Parse(Console.ReadLine());
+
+                if (AppointmentProcess.ValidateAppointmentDate(date))
+                {
+                    Console.WriteLine("[Valid Date]");
+                    break;
+                }
+                else
+                {
+                    Console.WriteLine("[Invalid. Please enter a valid date]");
+                }
+            }
 
             Console.Write("Enter Appointment Time (HH:MM AM/PM): ");
-            string time = Console.ReadLine();
+            TimeOnly time = TimeOnly.Parse(Console.ReadLine());
 
             Console.Write("Enter Service: ");
             string service = Console.ReadLine();
 
-            AppointmentProcess.AddAppointment(name, date, time, service);
-            Console.WriteLine("Appointment Booked Successfully!\n");
-        }
+            int appointmentId = AppointmentProcess.GenerateAppointmentId();
 
-        static void ViewAppointments()
-        {
-            Console.WriteLine("---------------------------");
-
-            if (AppointmentProcess.appointments.Count == 0)
-            {
-                Console.WriteLine("No scheduled appointments.\n");
-                return;
-            }
-
-            Console.WriteLine("=== Scheduled Appointments: ===");
-            for (int a = 0; a < AppointmentProcess.appointments.Count; a++)
-            {
-                Console.WriteLine(a + 1 + ". " + AppointmentProcess.appointments[a]);
-            }
-            Console.WriteLine("");
+            AppointmentProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            Console.WriteLine($"Appointment Booked Successfully! Your appointment ID is {appointmentId}\n");
         }
 
         static void CancelAppointment()
         {
             Console.WriteLine("---------------------------");
+            Console.WriteLine("=== Request Appointment Cancellation ===");
 
-            AppointmentProcess.ClearAvailableAppointments();
+            Console.Write("Enter Appointment ID to cancel: ");
+            int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            DisplayAvailableAppointments();
-
-            if (AppointmentProcess.availableAppointments.Count == 0)
+            if (AppointmentProcess.RequestCancellation(appointmentId))
             {
-                Console.WriteLine("There are no available appointments to cancel.\n");
+                Console.WriteLine("Cancellation request submitted. The staff will review it.\n");
             }
             else
             {
-                Console.Write("Enter appointment number to cancel: ");
-                int appointmentNum = Convert.ToInt16(Console.ReadLine());
+                Console.WriteLine("Appointment not found or already cancelled.\n");
+            }
+        }
 
-                if (AppointmentProcess.MarkAsCancelled(appointmentNum))
+        static void RescheduleAppointment()
+        {
+            Console.WriteLine("---------------------------");
+            Console.WriteLine("=== Request Appointment Reschedule ===");
+
+            Console.Write("Enter Appointment ID: ");
+            int appointmentId = Convert.ToInt32(Console.ReadLine());
+
+            if (!AppointmentProcess.ValidateAppointmentId(appointmentId))
+            {
+                Console.WriteLine("Invalid Appointment ID. Please try again.\n");
+                return;
+            }
+
+            DateOnly date;
+
+            while (true)
+            {
+                Console.Write("Enter Appointment Date (MM-DD-YYYY): ");
+                date = DateOnly.Parse(Console.ReadLine());
+
+                if (AppointmentProcess.ValidateAppointmentDate(date))
                 {
-                    Console.WriteLine("Appointment has been successfully cancelled.\n");
+                    Console.WriteLine("[Valid Date]");
+                    break;
                 }
                 else
                 {
-                    Console.WriteLine("INVALID. Please enter a valid appointment number.\n");
+                    Console.WriteLine("[Invalid. Please enter a valid date]");
                 }
             }
-        }
 
-        static void DisplayAvailableAppointments()
-        {
+            Console.Write("Enter new appointment time (HH:MM): ");
+            TimeOnly newTime = TimeOnly.Parse(Console.ReadLine());
 
-            int indexNum = 1;
-
-            for (int a = 0; a < AppointmentProcess.appointments.Count; a++)
+            if (AppointmentProcess.RequestReschedule(appointmentId, date, newTime))
             {
-                if (AppointmentProcess.AddAvailableAppointment(a))
-                {
-                    Console.WriteLine(indexNum + ". " + AppointmentProcess.appointments[a]);
-                    indexNum++;
-                }
+                Console.WriteLine("Reschedule request submitted. The staff will review it.\n");
             }
-
-            Console.WriteLine("");
+            else
+            {
+                Console.WriteLine("Unable to request reschedule. Appointment ID might be invalid or status doesn't allow rescheduling.\n");
+            }
         }
 
+        static void LoginAsAdmin()
+        {
+            Console.WriteLine("=== LOGIN ===");
+
+            Console.Write("Username: ");
+            string username = Console.ReadLine();
+
+            Console.Write("Password: ");
+            string password = Console.ReadLine();
+
+            if (AppointmentProcess.ValidateLogin(username, password))
+            {
+                Console.WriteLine("Login Successful!\n");
+                Admin.HandleAdminActions();
+            }
+            else
+            {
+                Console.WriteLine("Invalid username & password\n");
+            }
+        }       
+        }
     }
-}
 
