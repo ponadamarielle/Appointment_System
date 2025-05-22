@@ -24,12 +24,12 @@ namespace AppointmentBusinessLogic
         }
         public bool ValidateAppointmentId(int appointmentId)
         {
-            return appointmentDataProcess.GetAppointmentId(appointmentId) != null;
+            return appointmentDataProcess.GetAppointmentById(appointmentId) != null;
         }
 
         public bool RequestCancellation(int appointmentId)
         {
-            var appointment = appointmentDataProcess.GetAppointmentId(appointmentId);
+            var appointment = appointmentDataProcess.GetAppointmentById(appointmentId);
 
             if (appointment == null)
             {
@@ -41,7 +41,7 @@ namespace AppointmentBusinessLogic
                 return false;
             }
 
-            return appointmentDataProcess.Cancellation(appointmentId);
+            return appointmentDataProcess.CancelAppointment(appointmentId);
         }
 
         public bool ValidateCancellation(int appointmentId)
@@ -53,7 +53,7 @@ namespace AppointmentBusinessLogic
 
         public bool RequestReschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
         {
-            var appointment = appointmentDataProcess.GetAppointmentId(appointmentId);
+            var appointment = appointmentDataProcess.GetAppointmentById(appointmentId);
 
             if (appointment == null)
             {
@@ -65,7 +65,7 @@ namespace AppointmentBusinessLogic
                 return false;
             }
 
-            return appointmentDataProcess.Reschedule(appointmentId, newDate, newTime);
+            return appointmentDataProcess.RescheduleAppointmen(appointmentId, newDate, newTime);
         }
 
         public bool ValidateReschedule(int appointmentId)

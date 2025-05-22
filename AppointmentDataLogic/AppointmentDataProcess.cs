@@ -13,7 +13,7 @@ namespace AppointmentDataLogic
             appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
         }
 
-        public bool Cancellation(int appointmentId)
+        public bool CancelAppointment(int appointmentId)
         {
             return appointmentDataProcess.CancelAppointment(appointmentId);
         }
@@ -33,12 +33,12 @@ namespace AppointmentDataLogic
             return appointmentDataProcess.GetAllMessages();
         }
 
-        public Appointment GetAppointmentId(int id)
+        public Appointment GetAppointmentById(int id)
         {
             return appointmentDataProcess.GetAppointmentById(id);
         }
 
-        public Appointment GetAppointmentName(string name)
+        public Appointment GetAppointmentByName(string name)
         {
             return appointmentDataProcess.GetAppointmentByName(name);
         }
@@ -48,12 +48,12 @@ namespace AppointmentDataLogic
             return appointmentDataProcess.GetAppointmentStatus(appointmentId);
         }
 
-        public bool Reschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RescheduleAppointmen(int appointmentId, DateOnly newDate, TimeOnly newTime)
         {
             return appointmentDataProcess.RescheduleAppointment(appointmentId, newDate, newTime);
         }
 
-        public bool  UpdateStatus(int appointmentId, Status newStatus)
+        public bool UpdateAppointmentStatus(int appointmentId, Status newStatus)
         {
             return appointmentDataProcess.UpdateAppointmentStatus(appointmentId, newStatus);
         }

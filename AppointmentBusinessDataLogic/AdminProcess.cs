@@ -9,7 +9,7 @@ namespace AppointmentBusinessLogic
 
         public string SearchAppointmentName(string name)
         {
-            Appointment appointment = appointmentDataProcess.GetAppointmentName(name);
+            Appointment appointment = appointmentDataProcess.GetAppointmentByName(name);
 
             if(appointment != null)
             {
@@ -73,7 +73,7 @@ namespace AppointmentBusinessLogic
 
         public bool ValidateAppointmentId(int appointmentId)
         {
-            return appointmentDataProcess.GetAppointmentId(appointmentId) != null;
+            return appointmentDataProcess.GetAppointmentById(appointmentId) != null;
         }
 
         public bool IsValidStatus(string status)
@@ -94,7 +94,7 @@ namespace AppointmentBusinessLogic
             if (!ValidateStatus(appointmentId, newStatus))
                 return false;
 
-            if (appointmentDataProcess.UpdateStatus(appointmentId, newStatus))
+            if (appointmentDataProcess.UpdateAppointmentStatus(appointmentId, newStatus))
             {
                 updatedStatus = newStatus.ToString();
                 return true;
