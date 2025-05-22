@@ -1,129 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using AppointmentCommon;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using AppointmentCommon;
 
 namespace AppointmentDataLogic
 {
     public class AppointmentDataProcess
     {
-        private static List<Appointment> appointments = new List<Appointment>();
-        private static List<string> messages = new List<string>();
-        private static int appointmentId = 0;
+        static IAppointmentDataProcess appointmentDataProcess = new InMemoryDataService();
+        //static IAppointmentDataProcess appointmentDataProcess = new TextFileDataService();
+        //static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
 
-        public static bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public void AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
         {
-            Appointment newAppointment = new Appointment(appointmentId, name, mobileNum, date, time, service);
-            appointments.Add(newAppointment);
-
-            string appointmentMessage = $"{DateTime.Now} : {name} has scheduled an appointment.\n";
-            messages.Add(appointmentMessage);
-
-            return true;
+            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
         }
 
-        public static bool Cancellation(int appointmentId)
+        public bool Cancellation(int appointmentId)
         {
-            Appointment appointment = GetAppointmentId(appointmentId);
-
-            appointment.Status = Status.CancelRequested;
-
-            string cancellationMessage = $"{DateTime.Now} : {appointment.Name} has requested to cancel the appointment.\n";
-            messages.Add(cancellationMessage);
-
-            return true;
-
+            return appointmentDataProcess.CancelAppointment(appointmentId);
         }
 
-        public static bool Reschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public int GenerateAppointmentId()
         {
-
-            Appointment appointment = GetAppointmentId(appointmentId);
-
-            DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
-
-            appointment.NewRequestedDateTime = newRequestedDateTime;
-
-            appointment.Status = Status.RescheduleRequested;
-
-            string rescheduleMessage = $"{DateTime.Now} : {appointment.Name} has requested to reschedule the appointment.\n Requested new date and time: {newRequestedDateTime}";
-            messages.Add(rescheduleMessage);
-
-            return true;
+            return appointmentDataProcess.GenerateAppointmentId();
         }
 
-        public static Appointment GetAppointmentId(int id)
+        public List<Appointment> GetAllAppointments()
         {
-            foreach (var appointment in appointments)
-            {
-                if (appointment.Id == id)
-                {
-                    return appointment;
-                }
-            }
-            return null;
+            return appointmentDataProcess.GetAllAppointments();
         }
 
-        public static List<Appointment> AllAppointments()
+        public List<string> GetAllMessages()
         {
-            return appointments;
+            return appointmentDataProcess.GetAllMessages();
         }
 
-        public static List<string> AllMessages()
+        public Appointment GetAppointmentId(int id)
         {
-            return messages;
+            return appointmentDataProcess.GetAppointmentById(id);
         }
 
-        public static Status GetAppointmentStatus(int appointmentId)
+        public Appointment GetAppointmentName(string name)
         {
-            var appointment = GetAppointmentId(appointmentId);
-
-            if (appointment != null)
-            {
-                return appointment.Status;
-            }
-
-            return Status.Unknown;
+            return appointmentDataProcess.GetAppointmentByName(name);
         }
 
-        public static bool UpdateStatus(int appointmentId, Status newStatus)
+        public Status GetAppointmentStatus(int appointmentId)
         {
-            var appointment = GetAppointmentId(appointmentId);
-
-            if (appointment == null)
-            {
-                return false;
-            }
-
-            appointment.Status = newStatus;
-
-            return true;
+            return appointmentDataProcess.GetAppointmentStatus(appointmentId);
         }
 
-        public static int GenerateAppointmentId()
+        public bool Reschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
         {
-            appointmentId++;
-            return appointmentId;
+            return appointmentDataProcess.RescheduleAppointment(appointmentId, newDate, newTime);
         }
 
-        public static Appointment SearchAppointmentName(string name)
+        public bool  UpdateStatus(int appointmentId, Status newStatus)
         {
-            foreach (var appointment in appointments)
-            {
-                if (appointment.Name.ToLower().Contains(name.ToLower()))
-                {
-                    return appointment;
-                }
-            }
-            return null;
-            {
-
-            }
+            return appointmentDataProcess.UpdateAppointmentStatus(appointmentId, newStatus);
         }
+
 
     }
 }

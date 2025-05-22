@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Linq;
-using AppointmentBusinessLogic;
-using static System.Net.Mime.MediaTypeNames;
+﻿using AppointmentBusinessLogic;
 
 namespace AppointmentSystem
 {
@@ -130,9 +126,11 @@ namespace AppointmentSystem
             Console.Write("Enter Service: ");
             string service = Console.ReadLine();
 
-            int appointmentId = AppointmentProcess.GenerateAppointmentId();
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
 
-            AppointmentProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            int appointmentId = appointmentProcess.GenerateAppointmentId();
+
+            appointmentProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
             Console.WriteLine($"Appointment Booked Successfully! Your appointment ID is {appointmentId}\n");
         }
 
@@ -144,7 +142,9 @@ namespace AppointmentSystem
             Console.Write("Enter Appointment ID to cancel: ");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            if (AppointmentProcess.RequestCancellation(appointmentId))
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
+            if (appointmentProcess.RequestCancellation(appointmentId))
             {
                 Console.WriteLine("Cancellation request submitted. The staff will review it.\n");
             }
@@ -162,7 +162,9 @@ namespace AppointmentSystem
             Console.Write("Enter Appointment ID: ");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            if (!AppointmentProcess.ValidateAppointmentId(appointmentId))
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
+            if (!appointmentProcess.ValidateAppointmentId(appointmentId))
             {
                 Console.WriteLine("Invalid Appointment ID. Please try again.\n");
                 return;
@@ -189,7 +191,7 @@ namespace AppointmentSystem
             Console.Write("Enter new appointment time (HH:MM): ");
             TimeOnly newTime = TimeOnly.Parse(Console.ReadLine());
 
-            if (AppointmentProcess.RequestReschedule(appointmentId, date, newTime))
+            if (appointmentProcess.RequestReschedule(appointmentId, date, newTime))
             {
                 Console.WriteLine("Reschedule request submitted. The staff will review it.\n");
             }

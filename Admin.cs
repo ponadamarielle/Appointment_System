@@ -1,11 +1,4 @@
 ﻿using AppointmentBusinessLogic;
-using AppointmentCommon;
-using AppointmentDataLogic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AppointmentSystem
 {
@@ -55,7 +48,7 @@ namespace AppointmentSystem
                 "[5] Logout"
             };
 
-            Console.WriteLine("=== Staff Menu ====");
+            Console.WriteLine("=== Admin Menu ====");
 
             foreach (var m in menu)
             {
@@ -67,7 +60,8 @@ namespace AppointmentSystem
         {
             Console.WriteLine("---------------------------");
 
-            var appointments = AdminProcess.GetAllAppointments();
+            AdminProcess adminProcess = new AdminProcess();
+            var appointments = adminProcess.GetAllAppointments();
 
             if (appointments.Count == 0)
             {
@@ -101,11 +95,12 @@ namespace AppointmentSystem
 
             Console.WriteLine("=== Search Results ===");
 
-            Appointment appointment = AdminProcess.SearchAppointmentName(name);
+            AdminProcess adminProcess = new AdminProcess();
+            string appointmentInfo = adminProcess.SearchAppointmentName(name);
 
-            if (appointment != null)
+            if (appointmentInfo != null)
             {
-                Console.WriteLine(AdminProcess.GetAppointmentDetails(appointment));
+                Console.WriteLine(appointmentInfo);
             }
             else
             {
@@ -120,7 +115,8 @@ namespace AppointmentSystem
             Console.Write("\nEnter the appointment ID to update its status:");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            if (!AppointmentProcess.ValidateAppointmentId(appointmentId))
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            if (!appointmentProcess.ValidateAppointmentId(appointmentId))
             {
                 Console.WriteLine("Invalid Appointment ID. Please try again.\n");
                 return;
@@ -129,20 +125,22 @@ namespace AppointmentSystem
             Console.WriteLine("Enter new status for appointment (Confirmed, Rescheduled, Cancelled, Completed):");
             string input = Console.ReadLine();
 
-            if (Enum.TryParse(input, true, out Status newStatus))
+            AdminProcess adminProcess = new AdminProcess();
+            if(!adminProcess.IsValidStatus(input))
             {
-                if (AdminProcess.SetAppointmentStatus(appointmentId, newStatus))
-                {
-                    Console.WriteLine($"Appointment ID {appointmentId} status updated to {newStatus}.\n");
-                }
-                else
-                {
-                    Console.WriteLine("Appointment ID not found or status update not allowed.\n");
-                }
+                Console.WriteLine("Invalid status input.Please enter a valid status(Confirmed, Rescheduled, Cancelled, Completed).\n");
+                return;
+            }
+
+            bool update = adminProcess.UpdateAppointmentStatus(appointmentId, input, out string updatedStatus);
+
+            if(update)
+            {
+                Console.WriteLine($"Appointment ID {appointmentId} status updated to {updatedStatus}.\n");
             }
             else
             {
-                Console.WriteLine("Invalid status input. Please enter a valid status (Confirmed, Rescheduled, Cancelled, Completed).\n");
+                Console.WriteLine("Appointment ID not found or status update not allowed.\n");
             }
         }
 
@@ -152,7 +150,8 @@ namespace AppointmentSystem
             Console.WriteLine("=== Messages ===");
             Console.WriteLine("---------------------------");
 
-            var messages = AdminProcess.GetAllMessages();
+            AdminProcess adminProcess = new AdminProcess();
+            var messages = adminProcess.GetAllMessages();
 
             if (messages.Count == 0)
             {

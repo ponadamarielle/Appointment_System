@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AppointmentCommon;
+﻿using AppointmentCommon;
 using AppointmentDataLogic;
 
 namespace AppointmentBusinessLogic
 {
     public class AdminProcess
     {
+        AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
 
-        public static Appointment SearchAppointmentName(string name)
+        public string SearchAppointmentName(string name)
         {
-            return AppointmentDataProcess.SearchAppointmentName(name);
+            Appointment appointment = appointmentDataProcess.GetAppointmentName(name);
+
+            if(appointment != null)
+            {
+                return GetAppointmentDetails(appointment);
+            }
+            return null;
         }
 
-        public static string GetAppointmentDetails(Appointment appointment)
+        public string GetAppointmentDetails(Appointment appointment)
         {
             string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | " +
                              $"{appointment.Date} | {appointment.Time} | {appointment.Service} | {appointment.Status}";
@@ -29,32 +31,78 @@ namespace AppointmentBusinessLogic
             return details;
         }
 
-        public static List<Appointment> GetAllAppointments()
+        public List<Appointment> GetAllAppointments()
         {
-            return AppointmentDataProcess.AllAppointments();
+            return appointmentDataProcess.GetAllAppointments();
         }
 
-        public static List<string> GetAllMessages()
+        public List<string> GetAllMessages()
         {
-            return AppointmentDataProcess.AllMessages();
+            return appointmentDataProcess.GetAllMessages();
         }
 
-        public static bool SetAppointmentStatus(int appointmentId, Status newStatus)
+        public bool ValidateStatus(int appointmentId, Status newStatus)
         {
-            if (!ValidateStatus(appointmentId))
+            Status currentStatus = appointmentDataProcess.GetAppointmentStatus(appointmentId);
+
+            switch (currentStatus)
             {
-                return false;
-            }
+                case Status.Completed:
+                case Status.Cancelled:
+                    return false;
 
-            return AppointmentDataProcess.UpdateStatus(appointmentId, newStatus);
+                case Status.Rescheduled:
+                    return newStatus == Status.Cancelled || newStatus == Status.Completed;
+
+                case Status.CancelRequested:
+                    return newStatus == Status.Cancelled;
+
+                case Status.RescheduleRequested:
+                    return newStatus == Status.Rescheduled;
+
+                case Status.Confirmed:
+                    return newStatus == Status.Cancelled || newStatus == Status.Completed;
+                case Status.Pending:
+                    return newStatus == Status.Confirmed;
+
+                default:
+
+                    return false;
+            }
         }
 
-        public static bool ValidateStatus(int appointmentId)
+        public bool ValidateAppointmentId(int appointmentId)
         {
-            Status status = AppointmentDataProcess.GetAppointmentStatus(appointmentId);
+            return appointmentDataProcess.GetAppointmentId(appointmentId) != null;
+        }
 
-            return status != Status.Cancelled && status != Status.Completed;
+        public bool IsValidStatus(string status)
+        {
+            return Enum.TryParse(status, true, out Status _);
+        }
+
+        public bool UpdateAppointmentStatus(int appointmentId, string status, out string updatedStatus)
+        {
+            updatedStatus = null;
+
+            if (!Enum.TryParse(status, true, out Status newStatus))
+                return false;
+
+            if (!ValidateAppointmentId(appointmentId))
+                return false;
+
+            if (!ValidateStatus(appointmentId, newStatus))
+                return false;
+
+            if (appointmentDataProcess.UpdateStatus(appointmentId, newStatus))
+            {
+                updatedStatus = newStatus.ToString();
+                return true;
+            }
+            return false;
+
         }
     }
-}
+    }
+
 

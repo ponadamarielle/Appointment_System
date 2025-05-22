@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-
-namespace AppointmentCommon
+﻿namespace AppointmentCommon
 {
     public class Appointment
     {
@@ -18,17 +11,6 @@ namespace AppointmentCommon
             public Status Status { get; set; }
             public DateTime? NewRequestedDateTime { get; set; }
 
-        public Appointment(int id, string name, string mobile, DateOnly date, TimeOnly time, string service)
-        {
-            Id = id;
-            Name = name;
-            MobileNumber = mobile;
-            Date = date;
-            Time = time;
-            Service = service;
-            Status = Status.Pending;
-            NewRequestedDateTime = null;
-        }
     }
 
     }

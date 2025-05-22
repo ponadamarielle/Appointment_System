@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Xml.Linq;
-using System.Reflection;
-using AppointmentDataLogic;
+﻿using AppointmentDataLogic;
 using AppointmentCommon;
 
 namespace AppointmentBusinessLogic
 {
     public class AppointmentProcess
     {
-        public static bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
+
+        public void AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
         {
-            return AppointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            int newId = appointmentDataProcess.GenerateAppointmentId();
+            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
         }
-
-
         public static bool ValidateAppointmentDate(DateOnly date)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
@@ -29,15 +22,14 @@ namespace AppointmentBusinessLogic
             }
             return false;
         }
-
-        public static bool ValidateAppointmentId(int appointmentId)
+        public bool ValidateAppointmentId(int appointmentId)
         {
-            return AppointmentDataProcess.GetAppointmentId(appointmentId) != null;
+            return appointmentDataProcess.GetAppointmentId(appointmentId) != null;
         }
 
-        public static bool RequestCancellation(int appointmentId)
+        public bool RequestCancellation(int appointmentId)
         {
-            var appointment = AppointmentDataProcess.GetAppointmentId(appointmentId);
+            var appointment = appointmentDataProcess.GetAppointmentId(appointmentId);
 
             if (appointment == null)
             {
@@ -49,19 +41,19 @@ namespace AppointmentBusinessLogic
                 return false;
             }
 
-            return AppointmentDataProcess.Cancellation(appointmentId);
+            return appointmentDataProcess.Cancellation(appointmentId);
         }
 
-        public static bool ValidateCancellation(int appointmentId)
+        public bool ValidateCancellation(int appointmentId)
         {
-            Status status = AppointmentDataProcess.GetAppointmentStatus(appointmentId);
+            Status status = appointmentDataProcess.GetAppointmentStatus(appointmentId);
 
-            return status != Status.Cancelled && status != Status.Completed && status != Status.Pending;
+            return status != Status.Cancelled && status != Status.Completed;
         }
 
-        public static bool RequestReschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RequestReschedule(int appointmentId, DateOnly newDate, TimeOnly newTime)
         {
-            var appointment = AppointmentDataProcess.GetAppointmentId(appointmentId);
+            var appointment = appointmentDataProcess.GetAppointmentId(appointmentId);
 
             if (appointment == null)
             {
@@ -73,25 +65,25 @@ namespace AppointmentBusinessLogic
                 return false;
             }
 
-            return AppointmentDataProcess.Reschedule(appointmentId, newDate, newTime);
+            return appointmentDataProcess.Reschedule(appointmentId, newDate, newTime);
         }
 
-        public static bool ValidateReschedule(int appointmentId)
+        public bool ValidateReschedule(int appointmentId)
         {
-            Status status = AppointmentDataProcess.GetAppointmentStatus(appointmentId);
+            Status status = appointmentDataProcess.GetAppointmentStatus(appointmentId);
 
-            return status != Status.Cancelled && status != Status.Completed && status != Status.Rescheduled && status != Status.Pending && status != Status.CancelRequested;
-        }
-
-        public static int GenerateAppointmentId()
-        {
-            return AppointmentDataProcess.GenerateAppointmentId();
+            return status != Status.Cancelled && status != Status.Completed && status != Status.Rescheduled && status != Status.CancelRequested;
         }
 
         public static bool ValidateLogin(string username, string password)
         {
             return username == "admin" && password == "admin123";
         }
+
+        public int GenerateAppointmentId()
+        {
+            return appointmentDataProcess.GenerateAppointmentId();
         }
+    }
 
     }
