@@ -4,9 +4,10 @@ namespace AppointmentDataLogic
 {
     public class AppointmentDataProcess
     {
-        static IAppointmentDataProcess appointmentDataProcess = new InMemoryDataService();
+        //static IAppointmentDataProcess appointmentDataProcess = new InMemoryDataService();
         //static IAppointmentDataProcess appointmentDataProcess = new TextFileDataService();
         //static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
+        static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
 
         public void AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
         {
