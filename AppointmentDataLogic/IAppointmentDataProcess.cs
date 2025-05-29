@@ -12,7 +12,7 @@ namespace AppointmentDataLogic
         public List<Appointment> GetAllAppointments();
         public List<string> GetAllMessages();
         public Status GetAppointmentStatus(int appointmentId);
-        public Appointment GetAppointmentByName(string name);
+        public List<Appointment> GetAppointmentByName(string name);
         public int GenerateAppointmentId();
 
     }

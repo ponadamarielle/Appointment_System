@@ -9,12 +9,20 @@ namespace AppointmentBusinessLogic
 
         public string SearchAppointmentName(string name)
         {
-            Appointment appointment = appointmentDataProcess.GetAppointmentByName(name);
+            List<Appointment> appointments = appointmentDataProcess.GetAppointmentByName(name);
 
-            if(appointment != null)
+            if (appointments != null && appointments.Count > 0)
             {
-                return GetAppointmentDetails(appointment);
+                string result = "";
+
+                foreach (var appointment in appointments)
+                {
+                    result += GetAppointmentDetails(appointment) + "\n";
+                }
+
+                return result;
             }
+
             return null;
         }
 

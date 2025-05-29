@@ -71,7 +71,7 @@ namespace AppointmentDataLogic
 
             appointments.Add(newAppointment);
 
-            string appointmentMessage = $"{DateTime.Now.ToString("MM-dd-yyyy hh:mm tt")} : {name} has scheduled an appointment.\n";
+            string appointmentMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {name} has scheduled an appointment.\n";
             messages.Add(appointmentMessage);
 
             WriteDataToFile();
@@ -89,7 +89,7 @@ namespace AppointmentDataLogic
 
             appointment.Status = Status.CancelRequested;
 
-            string cancellationMessage = $"{DateTime.Now.ToString("MM-dd-yyyy hh:mm tt")} : {appointment.Name} has requested to cancel the appointment.\n";
+            string cancellationMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to cancel the appointment.\n";
             messages.Add(cancellationMessage);
 
             WriteDataToFile();
@@ -118,16 +118,19 @@ namespace AppointmentDataLogic
             return null;
         }
 
-        public Appointment GetAppointmentByName(string name)
+        public List<Appointment> GetAppointmentByName(string name)
         {
+            List<Appointment> results = new List<Appointment>();
+
             foreach (var appointment in appointments)
             {
                 if (appointment.Name.ToLower().Contains(name.ToLower()))
                 {
-                    return appointment;
+                    results.Add(appointment);
                 }
             }
-            return null;
+
+            return results;
         }
 
         public Status GetAppointmentStatus(int appointmentId)
@@ -158,7 +161,7 @@ namespace AppointmentDataLogic
 
             appointment.Status = Status.RescheduleRequested;
 
-            string rescheduleMessage = $"{DateTime.Now.ToString("MM-dd-yyyy hh:mm tt")} : {appointment.Name} has requested to reschedule the appointment.\n Requested new date and time: {newRequestedDateTime}";
+            string rescheduleMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to reschedule the appointment.\n Requested new date and time: {newRequestedDateTime}";
             messages.Add(rescheduleMessage);
 
             WriteDataToFile();

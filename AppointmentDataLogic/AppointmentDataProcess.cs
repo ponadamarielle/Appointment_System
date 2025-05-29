@@ -39,7 +39,7 @@ namespace AppointmentDataLogic
             return appointmentDataProcess.GetAppointmentById(id);
         }
 
-        public Appointment GetAppointmentByName(string name)
+        public List<Appointment> GetAppointmentByName(string name)
         {
             return appointmentDataProcess.GetAppointmentByName(name);
         }
