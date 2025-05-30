@@ -174,7 +174,7 @@ namespace AppointmentSystem
 
             while (true)
             {
-                Console.Write("Enter Appointment Date (MM-DD-YYYY): ");
+                Console.Write("Enter Appointment Date (yyyy-MM-dd): ");
                 date = DateOnly.Parse(Console.ReadLine());
 
                 if (AppointmentProcess.ValidateAppointmentDate(date))
