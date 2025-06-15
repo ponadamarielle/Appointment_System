@@ -21,6 +21,8 @@ namespace AppointmentDataLogic
 
             foreach (var line in lines)
             {
+                if (string.IsNullOrWhiteSpace(line)) continue;
+
                 var parts = line.Split('|');
 
                 appointments.Add(new Appointment
@@ -28,10 +30,11 @@ namespace AppointmentDataLogic
                     Id = int.Parse(parts[0]),
                     Name = parts[1],
                     MobileNumber = parts[2],
-                    Date = DateOnly.Parse(parts[3]),
-                    Time = TimeOnly.Parse(parts[4]),
-                    Service = parts[5],
-                    Status = Enum.Parse<Status>(parts[6]),
+                    Email = parts[3],
+                    Date = DateOnly.Parse(parts[4]),
+                    Time = TimeOnly.Parse(parts[5]),
+                    Service = parts[6],
+                    Status = Enum.Parse<Status>(parts[7]),
 
                 });
             }
@@ -45,9 +48,9 @@ namespace AppointmentDataLogic
 
             for (int i = 0; i < appointments.Count; i++)
             {
-                appointmentLines[i] = $"{appointments[i].Id}|{appointments[i].Name}|{appointments[i].MobileNumber}|" +
+                appointmentLines[i] = $"{appointments[i].Id}|{appointments[i].Name}|{appointments[i].MobileNumber}|{appointments[i].Email}|" +
                 $"{appointments[i].Date}|{appointments[i].Time}|{appointments[i].Service}|{appointments[i].Status}" +
-                $"{(appointments[i].Status == Status.Rescheduled && appointments[i].NewRequestedDateTime.HasValue ? 
+                $"{(appointments[i].Status == Status.RescheduleRequested && appointments[i].NewRequestedDateTime.HasValue ? 
                 $"|New Date & Time: {appointments[i].NewRequestedDateTime.Value:MM/dd/yyyy hh:mm tt}" : "")}";
             }
 
@@ -56,13 +59,14 @@ namespace AppointmentDataLogic
             File.WriteAllLines(messageFilePath, messages);
         }
 
-        public bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             Appointment newAppointment = new Appointment
             {
                 Id = appointmentId,
                 Name = name,
                 MobileNumber = mobileNum,
+                Email = email,
                 Date = date,
                 Time = time,
                 Service = service,
@@ -197,6 +201,16 @@ namespace AppointmentDataLogic
 
             appointmentId = id + 1;
             return appointmentId;
+        }
+
+        public void ConfirmReschedule(Appointment appointment)
+        {
+            if (appointment.NewRequestedDateTime.HasValue)
+            {
+                appointment.Date = DateOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.Time = TimeOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.NewRequestedDateTime = null;
+            }
         }
     }
 }

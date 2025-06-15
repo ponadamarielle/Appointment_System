@@ -9,14 +9,19 @@ namespace AppointmentDataLogic
         //static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
         static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
 
-        public void AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public void AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
-            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
         }
 
         public bool CancelAppointment(int appointmentId)
         {
             return appointmentDataProcess.CancelAppointment(appointmentId);
+        }
+
+        public void ConfirmReschedule(Appointment appointment)
+        {
+            appointmentDataProcess.ConfirmReschedule(appointment);
         }
 
         public int GenerateAppointmentId()
@@ -58,6 +63,8 @@ namespace AppointmentDataLogic
         {
             return appointmentDataProcess.UpdateAppointmentStatus(appointmentId, newStatus);
         }
+
+        
 
 
     }

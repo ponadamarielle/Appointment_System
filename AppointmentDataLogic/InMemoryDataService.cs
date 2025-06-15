@@ -21,6 +21,7 @@ namespace AppointmentDataLogic
                 Id = 1,
                 Name = "Jasmin Deyro",
                 MobileNumber = "09156784962",
+                Email = "jsmndyr@gmail.com",
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(-1)),
                 Time = TimeOnly.Parse("4:00 PM"),
                 Service = "Laser Treatment",
@@ -32,6 +33,7 @@ namespace AppointmentDataLogic
                 Id = 2,
                 Name = "Marielle Ponada",
                 MobileNumber = "09126578654",
+                Email = "marielleponada@gmail.com",
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(2)),
                 Time = TimeOnly.Parse("9:00 AM"),
                 Service = "Facial Treatment",
@@ -43,6 +45,7 @@ namespace AppointmentDataLogic
                 Id = 3,
                 Name = "Hecil Gesite",
                 MobileNumber = "09634535621",
+                Email = "heysill@gmail.com",
                 Date = DateOnly.FromDateTime(DateTime.Now.AddDays(5)),
                 Time = TimeOnly.Parse("1:00 PM"),
                 Service = "Whitening Peel",
@@ -58,13 +61,14 @@ namespace AppointmentDataLogic
             messages.Add($"{DateTime.Now.AddHours(4).ToString("MM-dd-yyyy hh:mm tt")} : Hecil Gesite has scheduled an appointment.\n");
         }
 
-        public bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             Appointment newAppointment = new Appointment
             {
                 Id = appointmentId,
                 Name = name,
                 MobileNumber = mobileNum,
+                Email = email,
                 Date = date,
                 Time = time,
                 Service = service,
@@ -184,6 +188,16 @@ namespace AppointmentDataLogic
         {
             appointmentId++;
             return appointmentId;
+        }
+
+        public void ConfirmReschedule(Appointment appointment)
+        {
+            if (appointment.NewRequestedDateTime.HasValue)
+            {
+                appointment.Date = DateOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.Time = TimeOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.NewRequestedDateTime = null;
+            }
         }
     }
 }

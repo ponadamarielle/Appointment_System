@@ -17,7 +17,7 @@ namespace AppointmentDataLogic
             sqlConnection = new SqlConnection(connectionString);
         }
 
-        public bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
 
             Appointment newAppointment = new Appointment
@@ -25,6 +25,7 @@ namespace AppointmentDataLogic
                 Id = appointmentId,
                 Name = name,
                 MobileNumber = mobileNum,
+                Email = email,
                 Date = date,
                 Time = time,
                 Service = service,
@@ -32,14 +33,15 @@ namespace AppointmentDataLogic
             };
 
             //appointment
-            var apptInsertStatement = "INSERT INTO tbl_appointments (id, name, mobileNumber, date, time, service, status) " +
-                "VALUES (@Id, @Name, @MobileNum, @Date, @Time, @Service, @Status)";
+            var apptInsertStatement = "INSERT INTO tbl_appointments (id, name, mobileNumber, email, date, time, service, status) " +
+                "VALUES (@Id, @Name, @MobileNum, @Email, @Date, @Time, @Service, @Status)";
 
             SqlCommand apptinsertCommand = new SqlCommand(apptInsertStatement, sqlConnection);
 
             apptinsertCommand.Parameters.AddWithValue("@Id", newAppointment.Id);
             apptinsertCommand.Parameters.AddWithValue("@Name", newAppointment.Name);
             apptinsertCommand.Parameters.AddWithValue("@MobileNum", newAppointment.MobileNumber);
+            apptinsertCommand.Parameters.AddWithValue("@Email", newAppointment.Email);
             apptinsertCommand.Parameters.AddWithValue("@Date", newAppointment.Date);
             apptinsertCommand.Parameters.AddWithValue("@Time", newAppointment.Time);
             apptinsertCommand.Parameters.AddWithValue("@Service", newAppointment.Service);
@@ -110,7 +112,7 @@ namespace AppointmentDataLogic
         }
         public List<Appointment> GetAllAppointments()
         {
-            string selectStatement = "SELECT Id, Name, MobileNumber, Date, Time, Service, Status, NewRequestedDateTime FROM tbl_appointments";
+            string selectStatement = "SELECT Id, Name, MobileNumber, Email, Date, Time, Service, Status, NewRequestedDateTime FROM tbl_appointments";
 
             SqlCommand selectCommand = new SqlCommand(selectStatement, sqlConnection);
 
@@ -127,6 +129,7 @@ namespace AppointmentDataLogic
                     Id = Convert.ToInt32(reader["Id"]),
                     Name = reader["Name"].ToString(),
                     MobileNumber = reader["MobileNumber"].ToString(),
+                    Email = reader["Email"].ToString(),
                     Date = DateOnly.FromDateTime(Convert.ToDateTime(reader["Date"])),
                     Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                     Service = reader["Service"].ToString(),
@@ -183,10 +186,12 @@ namespace AppointmentDataLogic
                         Id = Convert.ToInt32(reader["Id"]),
                         Name = reader["Name"].ToString(),
                         MobileNumber = reader["MobileNumber"].ToString(),
+                        Email = reader["Email"].ToString(),
                         Date = DateOnly.FromDateTime(Convert.ToDateTime(reader["Date"])),
                         Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                         Service = reader["Service"].ToString(),
-                        Status = Enum.Parse<Status>(reader["Status"].ToString())
+                        Status = Enum.Parse<Status>(reader["Status"].ToString()),
+                        NewRequestedDateTime = reader["newRequestedDateTime"] == DBNull.Value ? null : (DateTime?)reader["newRequestedDateTime"]
                     };
 
                     sqlConnection.Close();
@@ -215,6 +220,7 @@ namespace AppointmentDataLogic
                     Id = Convert.ToInt32(reader["Id"]),
                     Name = reader["Name"].ToString(),
                     MobileNumber = reader["MobileNumber"].ToString(),
+                    Email = reader["Email"].ToString(),
                     Date = DateOnly.FromDateTime(Convert.ToDateTime(reader["Date"])),
                     Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                     Service = reader["Service"].ToString(),
@@ -305,6 +311,21 @@ namespace AppointmentDataLogic
             sqlConnection.Close();
 
             return true;
+        }
+
+        public void ConfirmReschedule(Appointment appointment)
+        {
+            string updateStatement = "UPDATE tbl_appointments SET date = @NewDate, time = @NewTime, newRequestedDateTime = NULL, status = @Status WHERE id = @Id";
+
+            SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
+            updateCommand.Parameters.AddWithValue("@NewDate", appointment.Date);
+            updateCommand.Parameters.AddWithValue("@NewTime", appointment.Time);
+            updateCommand.Parameters.AddWithValue("@Status", appointment.Status);
+            updateCommand.Parameters.AddWithValue("@Id", appointment.Id);
+
+            sqlConnection.Open();
+            updateCommand.ExecuteNonQuery();
+            sqlConnection.Close();
         }
     }
 }

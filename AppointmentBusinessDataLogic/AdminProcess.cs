@@ -28,7 +28,7 @@ namespace AppointmentBusinessLogic
 
         public string GetAppointmentDetails(Appointment appointment)
         {
-            string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | " +
+            string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | {appointment.Email} |" +
                              $"{appointment.Date} | {appointment.Time} | {appointment.Service} | {appointment.Status}";
 
             if (appointment.NewRequestedDateTime.HasValue)
@@ -102,6 +102,28 @@ namespace AppointmentBusinessLogic
             if (!ValidateStatus(appointmentId, newStatus))
                 return false;
 
+            //confirm reschedule 
+            var appointment = appointmentDataProcess.GetAppointmentById(appointmentId);
+
+            if (appointment.Status == Status.RescheduleRequested && newStatus == Status.Rescheduled)
+            {
+                appointmentDataProcess.ConfirmReschedule(appointment);
+            }
+
+            if (appointment.Status == Status.RescheduleRequested && newStatus == Status.Rescheduled)
+            {
+                if (appointment.NewRequestedDateTime.HasValue)
+                {
+                    DateTime newDateTime = appointment.NewRequestedDateTime.Value;
+                    appointment.Date = DateOnly.FromDateTime(newDateTime);
+                    appointment.Time = TimeOnly.FromDateTime(newDateTime);
+                }
+
+                appointment.Status = newStatus;
+                appointmentDataProcess.ConfirmReschedule(appointment);
+            }
+
+            //update status
             if (appointmentDataProcess.UpdateAppointmentStatus(appointmentId, newStatus))
             {
                 updatedStatus = newStatus.ToString();

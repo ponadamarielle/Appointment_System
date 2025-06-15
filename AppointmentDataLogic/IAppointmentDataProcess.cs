@@ -4,7 +4,7 @@ namespace AppointmentDataLogic
 {
     interface IAppointmentDataProcess
     {
-        public bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service);
+        public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service);
         public bool CancelAppointment(int appointmentId);
         public bool RescheduleAppointment(int appointmentId, DateOnly newDate, TimeOnly newTime);
         public bool UpdateAppointmentStatus(int appointmentId, Status newStatus);
@@ -14,6 +14,7 @@ namespace AppointmentDataLogic
         public Status GetAppointmentStatus(int appointmentId);
         public List<Appointment> GetAppointmentByName(string name);
         public int GenerateAppointmentId();
+        public void ConfirmReschedule(Appointment appointment);
 
     }
 }

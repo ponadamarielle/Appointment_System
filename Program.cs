@@ -102,11 +102,14 @@ namespace AppointmentSystem
             Console.Write("Enter Mobile Number: ");
             string mobileNum = Console.ReadLine();
 
+            Console.Write("Enter Email: ");
+            string email = Console.ReadLine();
+
             DateOnly date;
 
             while (true)
             {
-                Console.Write("Enter Appointment Date (yyyy-MM-dd): ");
+                Console.Write("Enter preferred date (yyyy-MM-dd): ");
                 date = DateOnly.Parse(Console.ReadLine());
 
                 if (AppointmentProcess.ValidateAppointmentDate(date))
@@ -120,7 +123,7 @@ namespace AppointmentSystem
                 }
             }
 
-            Console.Write("Enter Appointment Time (HH:MM AM/PM): ");
+            Console.Write("Enter preferred time (HH:MM AM/PM): ");
             TimeOnly time = TimeOnly.Parse(Console.ReadLine());
 
             Console.Write("Enter Service: ");
@@ -130,7 +133,7 @@ namespace AppointmentSystem
 
             int appointmentId = appointmentProcess.GenerateAppointmentId();
 
-            appointmentProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            appointmentProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
             Console.WriteLine($"Appointment Booked Successfully! Your appointment ID is {appointmentId}\n");
         }
 

@@ -73,7 +73,7 @@ namespace AppointmentSystem
 
             foreach (var appointment in appointments)
             {
-                string details = $"{appointment.Id} - {appointment.Name} - {appointment.Date} - {appointment.Time} - " +
+                string details = $"{appointment.Id} - {appointment.Name} - {appointment.MobileNumber} - {appointment.Email} - {appointment.Date} - {appointment.Time} - " +
                                  $"{appointment.Service} - {appointment.Status}";
 
                 if (appointment.NewRequestedDateTime.HasValue)

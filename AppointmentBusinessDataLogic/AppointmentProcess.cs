@@ -7,10 +7,10 @@ namespace AppointmentBusinessLogic
     {
         AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
 
-        public void AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public void AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             int newId = appointmentDataProcess.GenerateAppointmentId();
-            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, date, time, service);
+            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
         }
         public static bool ValidateAppointmentDate(DateOnly date)
         {

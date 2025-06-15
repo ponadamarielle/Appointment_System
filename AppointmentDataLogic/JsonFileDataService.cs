@@ -1,4 +1,5 @@
 ﻿using AppointmentCommon;
+using System.Globalization;
 using System.Text.Json;
 
 namespace AppointmentDataLogic
@@ -57,13 +58,14 @@ namespace AppointmentDataLogic
             File.WriteAllText(messageJsonFilePath, messageJsonString);
         }
 
-        public bool AddAppointment(int appointmentId, string name, string mobileNum, DateOnly date, TimeOnly time, string service)
+        public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             Appointment newAppointment = new Appointment
             {
                 Id = appointmentId,
                 Name = name,
                 MobileNumber = mobileNum,
+                Email = email,
                 Date = date,
                 Time = time,
                 Service = service,
@@ -196,6 +198,16 @@ namespace AppointmentDataLogic
 
             appointmentId = id + 1;
             return appointmentId;
+        }
+
+        public void ConfirmReschedule(Appointment appointment)
+        {
+            if (appointment.NewRequestedDateTime.HasValue)
+            {
+                appointment.Date = DateOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.Time = TimeOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
+                appointment.NewRequestedDateTime = null;
+            }
         }
     }
 }
