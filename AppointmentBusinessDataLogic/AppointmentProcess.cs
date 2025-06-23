@@ -7,12 +7,12 @@ namespace AppointmentBusinessLogic
     {
         AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
 
-        public void AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
+        public void AddAppointment(string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             int newId = appointmentDataProcess.GenerateAppointmentId();
-            appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
+            appointmentDataProcess.AddAppointment(newId, name, mobileNum, email, date, time, service);
         }
-        public static bool ValidateAppointmentDate(DateOnly date)
+        public bool ValidateAppointmentDate(DateOnly date)
         {
             DateOnly today = DateOnly.FromDateTime(DateTime.Today);
 
@@ -75,7 +75,7 @@ namespace AppointmentBusinessLogic
             return status != Status.Cancelled && status != Status.Completed && status != Status.Rescheduled && status != Status.CancelRequested;
         }
 
-        public static bool ValidateLogin(string username, string password)
+        public bool ValidateLogin(string username, string password)
         {
             return username == "admin" && password == "admin123";
         }

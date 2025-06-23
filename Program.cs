@@ -107,12 +107,14 @@ namespace AppointmentSystem
 
             DateOnly date;
 
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
             while (true)
             {
                 Console.Write("Enter preferred date (yyyy-MM-dd): ");
                 date = DateOnly.Parse(Console.ReadLine());
 
-                if (AppointmentProcess.ValidateAppointmentDate(date))
+                if (appointmentProcess.ValidateAppointmentDate(date))
                 {
                     Console.WriteLine("[Valid Date]");
                     break;
@@ -129,11 +131,9 @@ namespace AppointmentSystem
             Console.Write("Enter Service: ");
             string service = Console.ReadLine();
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
-
             int appointmentId = appointmentProcess.GenerateAppointmentId();
 
-            appointmentProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
+            appointmentProcess.AddAppointment(name, mobileNum, email, date, time, service);
             Console.WriteLine($"Appointment Booked Successfully! Your appointment ID is {appointmentId}\n");
         }
 
@@ -180,7 +180,7 @@ namespace AppointmentSystem
                 Console.Write("Enter Appointment Date (yyyy-MM-dd): ");
                 date = DateOnly.Parse(Console.ReadLine());
 
-                if (AppointmentProcess.ValidateAppointmentDate(date))
+                if (appointmentProcess.ValidateAppointmentDate(date))
                 {
                     Console.WriteLine("[Valid Date]");
                     break;
@@ -214,7 +214,9 @@ namespace AppointmentSystem
             Console.Write("Password: ");
             string password = Console.ReadLine();
 
-            if (AppointmentProcess.ValidateLogin(username, password))
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
+            if (appointmentProcess.ValidateLogin(username, password))
             {
                 Console.WriteLine("Login Successful!\n");
                 Admin.HandleAdminActions();

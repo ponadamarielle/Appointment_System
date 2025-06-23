@@ -73,7 +73,7 @@ namespace Appointment_Desktop
             else if (cmb_request.SelectedIndex == 2)
             {
                 var newDate = DateOnly.FromDateTime(dtp_newDate.Value.Date);
-                if (!AppointmentProcess.ValidateAppointmentDate(newDate))
+                if (!appointmentProcess.ValidateAppointmentDate(newDate))
                 {
                     MessageBox.Show("[Please enter a valid date]", "INVALID", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;

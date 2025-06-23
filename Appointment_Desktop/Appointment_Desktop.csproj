@@ -10,13 +10,13 @@
 
   <ItemGroup>
     <Reference Include="AppointmentBusinessLogic">
-      <HintPath>..\..\Appointment_System\bin\Debug\net8.0\AppointmentBusinessLogic.dll</HintPath>
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentBusinessLogic.dll</HintPath>
     </Reference>
     <Reference Include="AppointmentCommon">
-      <HintPath>..\..\Appointment_System\bin\Debug\net8.0\AppointmentCommon.dll</HintPath>
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentCommon.dll</HintPath>
     </Reference>
     <Reference Include="AppointmentDataLogic">
-      <HintPath>..\..\Appointment_System\bin\Debug\net8.0\AppointmentDataLogic.dll</HintPath>
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentDataLogic.dll</HintPath>
     </Reference>
   </ItemGroup>
 

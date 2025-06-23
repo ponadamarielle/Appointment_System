@@ -13,10 +13,12 @@ namespace Appointment_Desktop
 
         private void txtbox_login_Click(object sender, EventArgs e)
         {
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
             var username = txtbox_username.Text;
             var password = txtbox_pass.Text;
 
-            if (AppointmentProcess.ValidateLogin(username, password))
+            if (appointmentProcess.ValidateLogin(username, password))
             {
                 MessageBox.Show("Login Successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 Admin admin = new Admin(homeForm);
