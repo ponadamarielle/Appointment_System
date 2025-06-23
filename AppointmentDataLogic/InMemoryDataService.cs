@@ -164,7 +164,7 @@ namespace AppointmentDataLogic
 
             appointment.Status = Status.RescheduleRequested;
 
-            string rescheduleMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to reschedule the appointment.\n Requested new date and time: {newRequestedDateTime}";
+            string rescheduleMessage = $"{DateTime.Now:yyyy-MM-dd h:mm tt} : {appointment.Name} has requested to reschedule the appointment.\nRequested new date and time: {newRequestedDateTime:M/d/yyyy h:mm tt}";
             messages.Add(rescheduleMessage);
 
             return true;
