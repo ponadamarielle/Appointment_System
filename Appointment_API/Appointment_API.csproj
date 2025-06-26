@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AppointmentBusinessLogic">
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentBusinessLogic.dll</HintPath>
+    </Reference>
+    <Reference Include="AppointmentCommon">
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentCommon.dll</HintPath>
+    </Reference>
+    <Reference Include="AppointmentDataLogic">
+      <HintPath>..\Appointment_System\bin\Debug\net8.0\AppointmentDataLogic.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>

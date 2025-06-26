@@ -17,26 +17,21 @@ namespace AppointmentBusinessLogic
 
                 foreach (var appointment in appointments)
                 {
-                    result += GetAppointmentDetails(appointment) + "\n";
+                    string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | {appointment.Email} |" +
+                                     $"{appointment.Date} | {appointment.Time} | {appointment.Service} | {appointment.Status}";
+
+                    if (appointment.NewRequestedDateTime.HasValue)
+                    {
+                        details += $" | New Date&Time: {appointment.NewRequestedDateTime.Value}";
+                    }
+
+                    result = details + "\n";
                 }
 
                 return result;
             }
 
             return null;
-        }
-
-        public string GetAppointmentDetails(Appointment appointment)
-        {
-            string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | {appointment.Email} |" +
-                             $"{appointment.Date} | {appointment.Time} | {appointment.Service} | {appointment.Status}";
-
-            if (appointment.NewRequestedDateTime.HasValue)
-            {
-                details += $" | New Date&Time: {appointment.NewRequestedDateTime.Value}";
-            }
-
-            return details;
         }
 
         public List<Appointment> GetAllAppointments()
@@ -79,11 +74,6 @@ namespace AppointmentBusinessLogic
             }
         }
 
-        public bool ValidateAppointmentId(int appointmentId)
-        {
-            return appointmentDataProcess.GetAppointmentById(appointmentId) != null;
-        }
-
         public bool IsValidStatus(string status)
         {
             return Enum.TryParse(status, true, out Status _);
@@ -91,12 +81,14 @@ namespace AppointmentBusinessLogic
 
         public bool UpdateAppointmentStatus(int appointmentId, string status, out string updatedStatus)
         {
+            AppointmentProcess appointmentProcess = new AppointmentProcess();
+
             updatedStatus = null;
 
             if (!Enum.TryParse(status, true, out Status newStatus))
                 return false;
 
-            if (!ValidateAppointmentId(appointmentId))
+            if (!appointmentProcess.ValidateAppointmentId(appointmentId))
                 return false;
 
             if (!ValidateStatus(appointmentId, newStatus))

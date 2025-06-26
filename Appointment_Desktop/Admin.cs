@@ -1,8 +1,4 @@
 ﻿using AppointmentBusinessLogic;
-using AppointmentCommon;
-using AppointmentDataLogic;
-using System.Data;
-using System.Xml.Linq;
 
 namespace Appointment_Desktop
 {
@@ -18,10 +14,12 @@ namespace Appointment_Desktop
 
         private void Admin_Load(object sender, EventArgs e)
         {
-            AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
+            AdminProcess adminProcess = new AdminProcess();
 
             //get all appointments
-            var appointments = appointmentDataProcess.GetAllAppointments();
+            var appointments = adminProcess.GetAllAppointments();
+
+            appointments.Sort((first, second) => second.Id.CompareTo(first.Id));
 
             dgv_appointments.AutoGenerateColumns = false;
             column_id.DataPropertyName = "Id";
@@ -37,7 +35,7 @@ namespace Appointment_Desktop
             dgv_appointments.DataSource = appointments;
 
             // get all messages
-            var messages = appointmentDataProcess.GetAllMessages();
+            var messages = adminProcess.GetAllMessages();
 
             listView_messages.Clear();
 

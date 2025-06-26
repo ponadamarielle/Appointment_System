@@ -6,8 +6,8 @@ namespace AppointmentDataLogic
     {
         //static IAppointmentDataProcess appointmentDataProcess = new InMemoryDataService();
         //static IAppointmentDataProcess appointmentDataProcess = new TextFileDataService();
-        //static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
-        static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
+        static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
+        //static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
 
         public void AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
