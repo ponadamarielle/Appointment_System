@@ -7,15 +7,13 @@ namespace AppointmentDataLogic
     public class JsonFileDataService : IAppointmentDataProcess
     {
         string appointmentJsonFilePath = "appointments.json";
-        string messageJsonFilePath = "messages.json";
         List<Appointment> appointments = new List<Appointment>();
-        List<string> messages = new List<string>();
+
         private int appointmentId = 0;
 
         public JsonFileDataService()
         {
             ReadAppointmentsData();
-            ReadMessagesData();
         }
 
         private void ReadAppointmentsData()
@@ -31,15 +29,6 @@ namespace AppointmentDataLogic
             appointments = JsonSerializer.Deserialize<List<Appointment>>(jsonText, options);
         }
 
-        private void ReadMessagesData()
-        {
-            string jsonText = File.ReadAllText(messageJsonFilePath);
-
-            messages = JsonSerializer.Deserialize<List<string>>(jsonText,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
-        }
-
         private void WriteJsonDataToFile()
         {
             var options = new JsonSerializerOptions
@@ -50,12 +39,6 @@ namespace AppointmentDataLogic
 
             string apptJsonString = JsonSerializer.Serialize(appointments, options);
             File.WriteAllText(appointmentJsonFilePath, apptJsonString);
-
-
-            string messageJsonString = JsonSerializer.Serialize(messages, new JsonSerializerOptions
-            { WriteIndented = true });
-
-            File.WriteAllText(messageJsonFilePath, messageJsonString);
         }
 
         public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
@@ -74,14 +57,11 @@ namespace AppointmentDataLogic
 
             appointments.Add(newAppointment);
 
-            string appointmentMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {name} has scheduled an appointment.\n";
-            messages.Add(appointmentMessage);
-
             WriteJsonDataToFile();
             return true;
         }
 
-        public bool CancelAppointment(int appointmentId)
+        public bool CancelAppointment(int appointmentId, string email)
         {
             Appointment appointment = GetAppointmentById(appointmentId);
 
@@ -90,10 +70,14 @@ namespace AppointmentDataLogic
                 return false;
             }
 
-            appointment.Status = Status.CancelRequested;
 
-            string cancellationMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to cancel the appointment.\n";
-            messages.Add(cancellationMessage);
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
+
+            appointment.Status = Status.CancelRequested;
 
             WriteJsonDataToFile();
             return true;
@@ -102,11 +86,6 @@ namespace AppointmentDataLogic
         public List<Appointment> GetAllAppointments()
         {
             return appointments;
-        }
-
-        public List<string> GetAllMessages()
-        {
-            return messages;
         }
 
         public Appointment GetAppointmentById(int id)
@@ -148,7 +127,7 @@ namespace AppointmentDataLogic
             return Status.Unknown;
         }
 
-        public bool RescheduleAppointment(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RescheduleAppointment(int appointmentId, string email, DateOnly newDate, TimeOnly newTime)
         {
             Appointment appointment = GetAppointmentById(appointmentId);
 
@@ -157,14 +136,15 @@ namespace AppointmentDataLogic
                 return false;
             }
 
-            DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
 
-            appointment.NewRequestedDateTime = newRequestedDateTime;
-
+            appointment.Date = newDate;
+            appointment.Time = newTime;
             appointment.Status = Status.RescheduleRequested;
-
-            string rescheduleMessage = $"{DateTime.Now:yyyy-MM-dd h:mm tt} : {appointment.Name} has requested to reschedule the appointment.\nRequested new date and time: {newRequestedDateTime:M/d/yyyy h:mm tt}";
-            messages.Add(rescheduleMessage);
 
             WriteJsonDataToFile();
             return true;
@@ -198,16 +178,6 @@ namespace AppointmentDataLogic
 
             appointmentId = id + 1;
             return appointmentId;
-        }
-
-        public void ConfirmReschedule(Appointment appointment)
-        {
-            if (appointment.NewRequestedDateTime.HasValue)
-            {
-                appointment.Date = DateOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
-                appointment.Time = TimeOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
-                appointment.NewRequestedDateTime = null;
-            }
         }
     }
 }

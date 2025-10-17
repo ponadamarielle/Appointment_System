@@ -10,7 +10,6 @@
             public TimeOnly Time { get; set; }
             public string Service { get; set; }
             public Status Status { get; set; }
-            public DateTime? NewRequestedDateTime { get; set; }
 
     }
 

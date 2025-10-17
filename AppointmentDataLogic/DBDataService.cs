@@ -47,27 +47,24 @@ namespace AppointmentDataLogic
             apptinsertCommand.Parameters.AddWithValue("@Service", newAppointment.Service);
             apptinsertCommand.Parameters.AddWithValue("@Status", newAppointment.Status.ToString());
 
-            //message
-            string appointmentMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {name} has scheduled an appointment.\n";
-            string messageInsertStatement = "INSERT INTO tbl_messages VALUES (@Message)";
-
-            SqlCommand messageInsertCommand = new SqlCommand(messageInsertStatement, sqlConnection);
-
-            messageInsertCommand.Parameters.AddWithValue("@Message", appointmentMessage);
-
             sqlConnection.Open();
 
             apptinsertCommand.ExecuteNonQuery();
-            messageInsertCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
             return true;
         }
 
-        public bool CancelAppointment(int appointmentId)
+        public bool CancelAppointment(int appointmentId, string email)
         {
             var appointment = GetAppointmentById(appointmentId);
             if (appointment == null)
+            {
+                return false;
+            }
+
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
             {
                 return false;
             }
@@ -80,18 +77,9 @@ namespace AppointmentDataLogic
             updateCommand.Parameters.AddWithValue("@Status", Status.CancelRequested.ToString());
             updateCommand.Parameters.AddWithValue("@Id", appointmentId);
 
-            //messages
-            string cancellationMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to cancel the appointment.\n";
-            string messageInsertStatement = "INSERT INTO tbl_messages VALUES (@Message)";
-
-            SqlCommand messageInsertCommand = new SqlCommand(messageInsertStatement, sqlConnection);
-
-            messageInsertCommand.Parameters.AddWithValue("@Message", cancellationMessage);
-
             sqlConnection.Open();
 
             updateCommand.ExecuteNonQuery();
-            messageInsertCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
             return true;
@@ -112,7 +100,7 @@ namespace AppointmentDataLogic
         }
         public List<Appointment> GetAllAppointments()
         {
-            string selectStatement = "SELECT Id, Name, MobileNumber, Email, Date, Time, Service, Status, NewRequestedDateTime FROM tbl_appointments";
+            string selectStatement = "SELECT Id, Name, MobileNumber, Email, Date, Time, Service, Status FROM tbl_appointments";
 
             SqlCommand selectCommand = new SqlCommand(selectStatement, sqlConnection);
 
@@ -134,9 +122,6 @@ namespace AppointmentDataLogic
                     Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                     Service = reader["Service"].ToString(),
                     Status = Enum.Parse<Status>(reader["Status"].ToString()),
-                    NewRequestedDateTime = reader["newRequestedDateTime"] == DBNull.Value
-                    ? null
-                    : Convert.ToDateTime(reader["newRequestedDateTime"])
                 };
                 appointments.Add(appointment);
 
@@ -144,28 +129,6 @@ namespace AppointmentDataLogic
 
             sqlConnection.Close();
             return appointments;
-        }
-
-        public List<string> GetAllMessages()
-        {
-            string selectStatement = "SELECT Messages FROM tbl_messages";
-
-            SqlCommand selectCommand = new SqlCommand(selectStatement, sqlConnection);
-
-            sqlConnection.Open();
-
-            SqlDataReader reader = selectCommand.ExecuteReader();
-
-            var messages = new List<string>();
-
-            while (reader.Read())
-            {
-                string message = reader["Messages"].ToString();
-                messages.Add(message);
-            }
-
-            sqlConnection.Close();
-            return messages;
         }
 
         public Appointment GetAppointmentById(int id)
@@ -191,7 +154,6 @@ namespace AppointmentDataLogic
                         Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                         Service = reader["Service"].ToString(),
                         Status = Enum.Parse<Status>(reader["Status"].ToString()),
-                        NewRequestedDateTime = reader["newRequestedDateTime"] == DBNull.Value ? null : (DateTime?)reader["newRequestedDateTime"]
                     };
 
                     sqlConnection.Close();
@@ -225,9 +187,6 @@ namespace AppointmentDataLogic
                     Time = TimeOnly.FromTimeSpan((TimeSpan)reader["Time"]),
                     Service = reader["Service"].ToString(),
                     Status = Enum.Parse<Status>(reader["Status"].ToString()),
-                    NewRequestedDateTime = reader["newRequestedDateTime"] == DBNull.Value
-                    ? null
-                    : Convert.ToDateTime(reader["newRequestedDateTime"])
                 });
             }
 
@@ -256,7 +215,7 @@ namespace AppointmentDataLogic
             return Status.Unknown;
         }
 
-        public bool RescheduleAppointment(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RescheduleAppointment(int appointmentId, string email, DateOnly newDate, TimeOnly newTime)
         {
             var appointment = GetAppointmentById(appointmentId);
             if (appointment == null)
@@ -264,29 +223,27 @@ namespace AppointmentDataLogic
                 return false;
             }
 
-            DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
 
             //appoinment
-            var updateStatement = $"UPDATE tbl_appointments SET newRequestedDateTime = @NewDateTime, status = @Status WHERE id = @Id";
+            DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
+
+            var updateStatement = "UPDATE tbl_appointments SET date = @Date, time = @Time, status = @Status WHERE id = @Id";
 
             SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
 
-            updateCommand.Parameters.AddWithValue("@NewDateTime", newRequestedDateTime);
+            updateCommand.Parameters.AddWithValue("@Date", newDate.ToDateTime(new TimeOnly(0, 0)));
+            updateCommand.Parameters.AddWithValue("@Time", newTime.ToTimeSpan());                
             updateCommand.Parameters.AddWithValue("@Status", Status.RescheduleRequested.ToString());
             updateCommand.Parameters.AddWithValue("@Id", appointmentId);
-
-            //messages
-            string rescheduleMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to reschedule the appointment.\n Requested new date and time: {newRequestedDateTime}";
-            string messageInsertStatement = "INSERT INTO tbl_messages VALUES (@Message)";
-
-            SqlCommand messageInsertCommand = new SqlCommand(messageInsertStatement, sqlConnection);
-
-            messageInsertCommand.Parameters.AddWithValue("@Message", rescheduleMessage);
 
             sqlConnection.Open();
 
             updateCommand.ExecuteNonQuery();
-            messageInsertCommand.ExecuteNonQuery();
 
             sqlConnection.Close();
             return true;
@@ -311,21 +268,6 @@ namespace AppointmentDataLogic
             sqlConnection.Close();
 
             return true;
-        }
-
-        public void ConfirmReschedule(Appointment appointment)
-        {
-            string updateStatement = "UPDATE tbl_appointments SET date = @NewDate, time = @NewTime, newRequestedDateTime = NULL, status = @Status WHERE id = @Id";
-
-            SqlCommand updateCommand = new SqlCommand(updateStatement, sqlConnection);
-            updateCommand.Parameters.AddWithValue("@NewDate", appointment.Date);
-            updateCommand.Parameters.AddWithValue("@NewTime", appointment.Time);
-            updateCommand.Parameters.AddWithValue("@Status", appointment.Status);
-            updateCommand.Parameters.AddWithValue("@Id", appointment.Id);
-
-            sqlConnection.Open();
-            updateCommand.ExecuteNonQuery();
-            sqlConnection.Close();
         }
     }
 }

@@ -5,13 +5,12 @@ namespace AppointmentDataLogic
     public class InMemoryDataService : IAppointmentDataProcess
     {
         List<Appointment> appointments = new List<Appointment>();
-        List<string> messages = new List<string>();
+
         private int appointmentId = 3;
 
         public InMemoryDataService()
         {
             CreateBooking();
-            CreateMessage();
         }
 
         private void CreateBooking()
@@ -54,13 +53,6 @@ namespace AppointmentDataLogic
 
         }
 
-        private void CreateMessage()
-        {
-            messages.Add($"{DateTime.Now.AddDays(-2).AddHours(2).ToString("MM-dd-yyyy hh:mm tt")} : Jasmin Deyro has scheduled an appointment.\n");
-            messages.Add($"{DateTime.Now.ToString("MM-dd-yyyy hh:mm tt")} : Marielle Ponada has scheduled an appointment.\n");
-            messages.Add($"{DateTime.Now.AddHours(4).ToString("MM-dd-yyyy hh:mm tt")} : Hecil Gesite has scheduled an appointment.\n");
-        }
-
         public bool AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             Appointment newAppointment = new Appointment
@@ -77,13 +69,10 @@ namespace AppointmentDataLogic
 
             appointments.Add(newAppointment);
 
-            string appointmentMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {name} has scheduled an appointment.\n";
-            messages.Add(appointmentMessage);
-
             return true;
         }
 
-        public bool CancelAppointment(int appointmentId)
+        public bool CancelAppointment(int appointmentId, string email)
         {
             Appointment appointment = GetAppointmentById(appointmentId);
 
@@ -92,10 +81,13 @@ namespace AppointmentDataLogic
                 return false;
             }
 
-            appointment.Status = Status.CancelRequested;
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
 
-            string cancellationMessage = $"{DateTime.Now.ToString("yyyy-MM-dd hh:mm tt")} : {appointment.Name} has requested to cancel the appointment.\n";
-            messages.Add(cancellationMessage);
+            appointment.Status = Status.CancelRequested;
 
             return true;
         }
@@ -103,11 +95,6 @@ namespace AppointmentDataLogic
         public List<Appointment> GetAllAppointments()
         {
             return appointments;
-        }
-
-        public List<string> GetAllMessages()
-        {
-            return messages;
         }
 
         public Appointment GetAppointmentById(int id)
@@ -149,7 +136,7 @@ namespace AppointmentDataLogic
             return Status.Unknown;
         }
 
-        public bool RescheduleAppointment(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RescheduleAppointment(int appointmentId, string email, DateOnly newDate, TimeOnly newTime)
         {
             Appointment appointment = GetAppointmentById(appointmentId);
 
@@ -158,14 +145,15 @@ namespace AppointmentDataLogic
                 return false;
             }
 
-            DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
+            //check email
+            if (!appointment.Email.Equals(email, StringComparison.OrdinalIgnoreCase))
+            {
+                return false;
+            }
 
-            appointment.NewRequestedDateTime = newRequestedDateTime;
-
+            appointment.Date = newDate;
+            appointment.Time = newTime;
             appointment.Status = Status.RescheduleRequested;
-
-            string rescheduleMessage = $"{DateTime.Now:yyyy-MM-dd h:mm tt} : {appointment.Name} has requested to reschedule the appointment.\nRequested new date and time: {newRequestedDateTime:M/d/yyyy h:mm tt}";
-            messages.Add(rescheduleMessage);
 
             return true;
         }
@@ -188,16 +176,6 @@ namespace AppointmentDataLogic
         {
             appointmentId++;
             return appointmentId;
-        }
-
-        public void ConfirmReschedule(Appointment appointment)
-        {
-            if (appointment.NewRequestedDateTime.HasValue)
-            {
-                appointment.Date = DateOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
-                appointment.Time = TimeOnly.FromDateTime(appointment.NewRequestedDateTime.Value);
-                appointment.NewRequestedDateTime = null;
-            }
         }
     }
 }

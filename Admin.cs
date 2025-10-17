@@ -25,17 +25,14 @@ namespace AppointmentSystem
                         UpdateAppointmentStatus();
                         break;
                     case 4:
-                        ViewMessages();
-                        break;
-                    case 5:
                         Console.WriteLine("Logout!");
                         break;
                     default:
-                        Console.WriteLine("INVALID. Please enter between 1-5 only.\n");
+                        Console.WriteLine("INVALID. Please enter between 1-4 only.\n");
                         break;
                 }
             }
-            while (action != 5);
+            while (action != 4);
         }
         static void DisplayAdminMenu()
         {
@@ -44,8 +41,7 @@ namespace AppointmentSystem
                 "[1] View All Appointments",
                 "[2] Search Appointments",
                 "[3] Update Appointment Status",
-                "[4] Messages",
-                "[5] Logout"
+                "[4] Logout"
             };
 
             Console.WriteLine("=== Admin Menu ====");
@@ -73,18 +69,15 @@ namespace AppointmentSystem
 
             foreach (var appointment in appointments)
             {
-                string details = $"{appointment.Id} - {appointment.Name} - {appointment.MobileNumber} - {appointment.Email} - {appointment.Date} - {appointment.Time} - " +
-                                 $"{appointment.Service} - {appointment.Status}";
-
-                if (appointment.NewRequestedDateTime.HasValue)
-                {
-                    details += $" - New Date&Time: {appointment.NewRequestedDateTime.Value}";
-                }
+                string details = $"{appointment.Id} - {appointment.Name} - {appointment.MobileNumber} - {appointment.Email} - " +
+                                 $"{appointment.Date} - {appointment.Time} - {appointment.Service} - {appointment.Status}";
 
                 Console.WriteLine(details);
             }
+
             Console.WriteLine("");
         }
+
 
         static void SearchAppointment()
         {
@@ -141,29 +134,6 @@ namespace AppointmentSystem
             else
             {
                 Console.WriteLine("Appointment ID not found or status update not allowed.\n");
-            }
-        }
-
-        static void ViewMessages()
-        {
-            Console.WriteLine("---------------------------");
-            Console.WriteLine("=== Messages ===");
-            Console.WriteLine("---------------------------");
-
-            AdminProcess adminProcess = new AdminProcess();
-            var messages = adminProcess.GetAllMessages();
-
-            if (messages.Count == 0)
-            {
-                Console.WriteLine("No messages.\n");
-                return;
-            }
-
-            foreach (var message in messages)
-            {
-                Console.WriteLine(message);
-                Console.WriteLine("---------------------------");
-
             }
         }
 

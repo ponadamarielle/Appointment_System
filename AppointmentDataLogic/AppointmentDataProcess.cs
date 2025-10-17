@@ -6,22 +6,17 @@ namespace AppointmentDataLogic
     {
         //static IAppointmentDataProcess appointmentDataProcess = new InMemoryDataService();
         //static IAppointmentDataProcess appointmentDataProcess = new TextFileDataService();
-        static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
-        //static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
+        //static IAppointmentDataProcess appointmentDataProcess = new JsonFileDataService();
+        static IAppointmentDataProcess appointmentDataProcess = new DBDataService();
 
         public void AddAppointment(int appointmentId, string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             appointmentDataProcess.AddAppointment(appointmentId, name, mobileNum, email, date, time, service);
         }
 
-        public bool CancelAppointment(int appointmentId)
+        public bool CancelAppointment(int appointmentId, string email)
         {
-            return appointmentDataProcess.CancelAppointment(appointmentId);
-        }
-
-        public void ConfirmReschedule(Appointment appointment)
-        {
-            appointmentDataProcess.ConfirmReschedule(appointment);
+            return appointmentDataProcess.CancelAppointment(appointmentId, email);
         }
 
         public int GenerateAppointmentId()
@@ -32,11 +27,6 @@ namespace AppointmentDataLogic
         public List<Appointment> GetAllAppointments()
         {
             return appointmentDataProcess.GetAllAppointments();
-        }
-
-        public List<string> GetAllMessages()
-        {
-            return appointmentDataProcess.GetAllMessages();
         }
 
         public Appointment GetAppointmentById(int id)
@@ -54,9 +44,9 @@ namespace AppointmentDataLogic
             return appointmentDataProcess.GetAppointmentStatus(appointmentId);
         }
 
-        public bool RescheduleAppointmen(int appointmentId, DateOnly newDate, TimeOnly newTime)
+        public bool RescheduleAppointment(int appointmentId, string email, DateOnly newDate, TimeOnly newTime)
         {
-            return appointmentDataProcess.RescheduleAppointment(appointmentId, newDate, newTime);
+            return appointmentDataProcess.RescheduleAppointment(appointmentId, email, newDate, newTime);
         }
 
         public bool UpdateAppointmentStatus(int appointmentId, Status newStatus)

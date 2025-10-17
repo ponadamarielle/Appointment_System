@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.14.1" />
     <PackageReference Include="System.Resources.Extensions" Version="9.0.6" />
   </ItemGroup>
 

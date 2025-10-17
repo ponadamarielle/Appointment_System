@@ -13,14 +13,17 @@
     <Compile Remove="AppointmentBusinessDataLogic\**" />
     <Compile Remove="AppointmentCommon\**" />
     <Compile Remove="AppointmentDataLogic\**" />
+    <Compile Remove="Appointment_API\**" />
     <Compile Remove="Appointment_Desktop\**" />
     <EmbeddedResource Remove="AppointmentBusinessDataLogic\**" />
     <EmbeddedResource Remove="AppointmentCommon\**" />
     <EmbeddedResource Remove="AppointmentDataLogic\**" />
+    <EmbeddedResource Remove="Appointment_API\**" />
     <EmbeddedResource Remove="Appointment_Desktop\**" />
     <None Remove="AppointmentBusinessDataLogic\**" />
     <None Remove="AppointmentCommon\**" />
     <None Remove="AppointmentDataLogic\**" />
+    <None Remove="Appointment_API\**" />
     <None Remove="Appointment_Desktop\**" />
   </ItemGroup>
 

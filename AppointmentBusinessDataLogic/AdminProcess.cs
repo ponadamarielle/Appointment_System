@@ -20,11 +20,6 @@ namespace AppointmentBusinessLogic
                     string details = $"{appointment.Id} | {appointment.Name} | {appointment.MobileNumber} | {appointment.Email} |" +
                                      $"{appointment.Date} | {appointment.Time} | {appointment.Service} | {appointment.Status}";
 
-                    if (appointment.NewRequestedDateTime.HasValue)
-                    {
-                        details += $" | New Date&Time: {appointment.NewRequestedDateTime.Value}";
-                    }
-
                     result = details + "\n";
                 }
 
@@ -37,11 +32,6 @@ namespace AppointmentBusinessLogic
         public List<Appointment> GetAllAppointments()
         {
             return appointmentDataProcess.GetAllAppointments();
-        }
-
-        public List<string> GetAllMessages()
-        {
-            return appointmentDataProcess.GetAllMessages();
         }
 
         public bool ValidateStatus(int appointmentId, Status newStatus)
@@ -99,20 +89,7 @@ namespace AppointmentBusinessLogic
 
             if (appointment.Status == Status.RescheduleRequested && newStatus == Status.Rescheduled)
             {
-                appointmentDataProcess.ConfirmReschedule(appointment);
-            }
-
-            if (appointment.Status == Status.RescheduleRequested && newStatus == Status.Rescheduled)
-            {
-                if (appointment.NewRequestedDateTime.HasValue)
-                {
-                    DateTime newDateTime = appointment.NewRequestedDateTime.Value;
-                    appointment.Date = DateOnly.FromDateTime(newDateTime);
-                    appointment.Time = TimeOnly.FromDateTime(newDateTime);
-                }
-
                 appointment.Status = newStatus;
-                appointmentDataProcess.ConfirmReschedule(appointment);
             }
 
             //update status

@@ -147,13 +147,22 @@ namespace AppointmentSystem
 
             AppointmentProcess appointmentProcess = new AppointmentProcess();
 
-            if (appointmentProcess.RequestCancellation(appointmentId))
+            if (!appointmentProcess.ValidateAppointmentId(appointmentId))
+            {
+                Console.WriteLine("Appointment ID not found.\n");
+                return;
+            }
+
+            Console.Write("Enter Email: ");
+            string email = Console.ReadLine();
+
+            if (appointmentProcess.RequestCancellation(appointmentId, email))
             {
                 Console.WriteLine("Cancellation request submitted. The staff will review it.\n");
             }
             else
             {
-                Console.WriteLine("Appointment not found or already cancelled.\n");
+                Console.WriteLine("Unable to request cancellation. Email might not match the record.\n");
             }
         }
 
@@ -194,13 +203,16 @@ namespace AppointmentSystem
             Console.Write("Enter new appointment time (HH:MM): ");
             TimeOnly newTime = TimeOnly.Parse(Console.ReadLine());
 
-            if (appointmentProcess.RequestReschedule(appointmentId, date, newTime))
+            Console.Write("Enter Email: ");
+            string email = Console.ReadLine();
+
+            if (appointmentProcess.RequestReschedule(appointmentId, email, date, newTime))
             {
                 Console.WriteLine("Reschedule request submitted. The staff will review it.\n");
             }
             else
             {
-                Console.WriteLine("Unable to request reschedule. Appointment ID might be invalid or status doesn't allow rescheduling.\n");
+                Console.WriteLine("Unable to request reschedule. Email does not match our records.\n");
             }
         }
 
