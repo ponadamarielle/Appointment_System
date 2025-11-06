@@ -1,9 +1,12 @@
 ﻿using AppointmentBusinessLogic;
+using Microsoft.Extensions.Configuration;
 
 namespace AppointmentSystem
 {
     public class Admin
     {
+        private static IConfiguration configuration;
+
         public static void HandleAdminActions()
         {
             int action;
@@ -108,7 +111,8 @@ namespace AppointmentSystem
             Console.Write("\nEnter the appointment ID to update its status:");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
             if (!appointmentProcess.ValidateAppointmentId(appointmentId))
             {
                 Console.WriteLine("Invalid Appointment ID. Please try again.\n");

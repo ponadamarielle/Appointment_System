@@ -1,3 +1,4 @@
+using AppointmentBusinessLogic;
 
 namespace Appointment_API
 {
@@ -13,6 +14,9 @@ namespace Appointment_API
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<EmailService>();
+            builder.Services.AddScoped<AppointmentProcess>();
 
             var app = builder.Build();
 

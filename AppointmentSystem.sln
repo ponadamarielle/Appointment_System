@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppointmentDataLogic", "App
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppointmentCommon", "AppointmentCommon\AppointmentCommon.csproj", "{A37919AC-8CD6-4B0D-BEAB-34FA5A8DA478}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appointment_API", "Appointment_API\Appointment_API.csproj", "{5D6F397A-67D3-46A3-99DC-ED5C8D7AA4CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{A37919AC-8CD6-4B0D-BEAB-34FA5A8DA478}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A37919AC-8CD6-4B0D-BEAB-34FA5A8DA478}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A37919AC-8CD6-4B0D-BEAB-34FA5A8DA478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5D6F397A-67D3-46A3-99DC-ED5C8D7AA4CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5D6F397A-67D3-46A3-99DC-ED5C8D7AA4CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5D6F397A-67D3-46A3-99DC-ED5C8D7AA4CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5D6F397A-67D3-46A3-99DC-ED5C8D7AA4CF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

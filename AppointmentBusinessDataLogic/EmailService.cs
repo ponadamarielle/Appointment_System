@@ -1,16 +1,27 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
+using Microsoft.Extensions.Configuration;
 using MimeKit;
 
 namespace AppointmentBusinessLogic
 {
-    class EmailService
+    public class EmailService
     {
-        public void SendEmailToAdmin(string name, string email, string subject, string body)
+        private readonly IConfiguration _configuration;
+
+        public EmailService(IConfiguration configuration)
+        {
+            _configuration = configuration;
+        }
+
+        public void SendEmailToAdmin(string subject, string body)
         {
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress("Client", "client@example.com"));
+            message.From.Add(new MailboxAddress(
+                _configuration["EmailSettings:FromName"],
+                _configuration["EmailSettings:FromEmail"]
+            ));
             message.To.Add(new MailboxAddress("Admin", "aestheticclinic@admin.com"));
-            message.ReplyTo.Add(new MailboxAddress(name, email));
             message.Subject = subject;
             message.Body = new TextPart("plain")
             {
@@ -19,15 +30,16 @@ namespace AppointmentBusinessLogic
 
             using (var client = new SmtpClient())
             {
-                var smtpHostn = "sandbox.smtp.mailtrap.io";
-                var smtpPort = 2525;
-                var tls = MailKit.Security.SecureSocketOptions.StartTls;
-                client.Connect(smtpHostn, smtpPort, tls);
+                client.Connect(
+                    _configuration["EmailSettings:SmtpHost"],
+                    int.Parse(_configuration["EmailSettings:SmtpPort"]),
+                    SecureSocketOptions.StartTls
+                );
 
-                var userName = "c4c4b4470fbc07";
-                var password = "11abc0ba76591d";
-
-                client.Authenticate(userName, password);
+                client.Authenticate(
+                    _configuration["EmailSettings:Username"],
+                    _configuration["EmailSettings:Password"]
+                );
 
                 client.Send(message);
                 client.Disconnect(true);

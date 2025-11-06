@@ -1,11 +1,13 @@
 ﻿using AppointmentCommon;
 using AppointmentDataLogic;
+using Microsoft.Extensions.Configuration;
 
 namespace AppointmentBusinessLogic
 {
     public class AdminProcess
     {
         AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
+        private IConfiguration configuration;
 
         public string SearchAppointmentName(string name)
         {
@@ -71,7 +73,8 @@ namespace AppointmentBusinessLogic
 
         public bool UpdateAppointmentStatus(int appointmentId, string status, out string updatedStatus)
         {
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
 
             updatedStatus = null;
 

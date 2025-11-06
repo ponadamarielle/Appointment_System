@@ -1,5 +1,5 @@
-﻿using AppointmentDataLogic;
-using AppointmentCommon;
+﻿using AppointmentCommon;
+using AppointmentDataLogic;
 
 namespace AppointmentBusinessLogic
 {
@@ -7,16 +7,22 @@ namespace AppointmentBusinessLogic
     {
         AppointmentDataProcess appointmentDataProcess = new AppointmentDataProcess();
 
+        private readonly EmailService _emailService;
+
+        public AppointmentProcess(EmailService emailService)
+        {
+            _emailService = emailService;
+        }
+
         public void AddAppointment(string name, string mobileNum, string email, DateOnly date, TimeOnly time, string service)
         {
             int newId = appointmentDataProcess.GenerateAppointmentId();
             appointmentDataProcess.AddAppointment(newId, name, mobileNum, email, date, time, service);
 
-            EmailService emailService = new EmailService();
             string subject = "New Appointment Booked";
             string body = $"A new appointment has been booked by {name}.\nContact: {mobileNum}, {email}\nService: {service}\nDate & Time: {date} at {time}.";
 
-            emailService.SendEmailToAdmin(name, email, subject, body);
+            _emailService.SendEmailToAdmin(subject, body);
         }
         public bool ValidateAppointmentDate(DateOnly date)
         {
@@ -51,11 +57,10 @@ namespace AppointmentBusinessLogic
 
             if (result)
             {
-                EmailService emailService = new EmailService();
                 string subject = "Appointment Cancellation Request";
                 string body = $"{DateTime.Now:yyyy-MM-dd hh:mm tt} : {appointment.Name} has requested to cancel the appointment.\n";
 
-                emailService.SendEmailToAdmin(appointment.Name, email, subject, body);
+                _emailService.SendEmailToAdmin(subject, body);
             }
 
             return result;
@@ -86,13 +91,12 @@ namespace AppointmentBusinessLogic
 
             if (result)
             {
-                EmailService emailService = new EmailService();
                 string subject = "Appointment Reschedule Request";
 
                 DateTime newRequestedDateTime = newDate.ToDateTime(newTime);
                 string body = $"{DateTime.Now:yyyy-MM-dd h:mm tt} : {appointment.Name} has requested to reschedule the appointment.\nRequested new date and time: {newRequestedDateTime:M/d/yyyy h:mm tt}";
 
-                emailService.SendEmailToAdmin(appointment.Name, email, subject, body);
+                _emailService.SendEmailToAdmin(subject, body);
             }
 
             return result;

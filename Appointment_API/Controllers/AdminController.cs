@@ -18,14 +18,6 @@ namespace Appointment_API.Controllers
             return appointments;
         }
 
-        [HttpGet("messages")]
-        public IEnumerable<string> GetMessages()
-        {
-            var messages = adminProcess.GetAllMessages();
-
-            return messages;
-        }
-
         [HttpGet("search")]
         public string SearchAppointmentName(string name)
         {

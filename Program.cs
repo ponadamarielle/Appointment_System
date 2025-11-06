@@ -1,9 +1,12 @@
 ﻿using AppointmentBusinessLogic;
+using Microsoft.Extensions.Configuration;
 
 namespace AppointmentSystem
 {
     internal class Program
     {
+        private static IConfiguration configuration;
+
         static void Main(string[] args)
         {
 
@@ -107,7 +110,8 @@ namespace AppointmentSystem
 
             DateOnly date;
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
 
             while (true)
             {
@@ -145,7 +149,8 @@ namespace AppointmentSystem
             Console.Write("Enter Appointment ID to cancel: ");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
 
             if (!appointmentProcess.ValidateAppointmentId(appointmentId))
             {
@@ -174,7 +179,8 @@ namespace AppointmentSystem
             Console.Write("Enter Appointment ID: ");
             int appointmentId = Convert.ToInt32(Console.ReadLine());
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
 
             if (!appointmentProcess.ValidateAppointmentId(appointmentId))
             {
@@ -226,7 +232,8 @@ namespace AppointmentSystem
             Console.Write("Password: ");
             string password = Console.ReadLine();
 
-            AppointmentProcess appointmentProcess = new AppointmentProcess();
+            EmailService emailService = new EmailService(configuration);
+            AppointmentProcess appointmentProcess = new AppointmentProcess(emailService);
 
             if (appointmentProcess.ValidateLogin(username, password))
             {
